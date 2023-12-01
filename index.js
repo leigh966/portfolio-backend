@@ -33,19 +33,23 @@ crypto.randomBytes(127, (err, buf) => {
   res.send(sessionId)
 });
 }
-
+const verifyOTP = require("./verify");
 app.post('/login', (req, res) => {
 	const json = req.body;
-	if(comparePassword(json.password, process.env.SALT, process.env.PASSWORD_HASH))
+	const passwordCorrect = comparePassword(json.password, process.env.SALT, process.env.PASSWORD_HASH);
+	const otpCorrect = verifyOTP(json.otp);
+	if(passwordCorrect && otpCorrect)
 	{
 		res.status(201)
 		generateSessionId(res);
 		return;
 	}
 	res.status(401)
-	res.send("Incorrect Password")
+	res.send("Failed To Authenticate")
   });
   
+
+
 // Server setup 
 app.listen(3000, () => { 
     console.log("Server is Running") 
