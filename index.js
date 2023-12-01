@@ -2,11 +2,21 @@
 // Importing express module 
 const express = require("express") 
 const app = express() 
-  
-// Handling GET / request 
-app.use("/", (req, res, next) => { 
-    res.send("Hello World") 
-}) 
+
+app.use(express.json());
+
+
+app.post('/login', (req, res) => {
+	const json = req.body;
+	if(json.password == "password")
+	{
+		res.status(201)
+		res.send("Logged In")
+		return;
+	}
+	res.status(401)
+	res.send("Incorrect Password")
+  });
   
 // Server setup 
 app.listen(3000, () => { 
