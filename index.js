@@ -66,7 +66,7 @@ app.post('/login', (req, res) => {
 	const json = req.body;
 	const passwordCorrect = verify.password(json.password, process.env.SALT, process.env.PASSWORD_HASH);
 	const otpCorrect = verify.otp(json.otp);
-	if(passwordCorrect)// && otpCorrect)
+	if(passwordCorrect && otpCorrect)
 	{
 		res.status(201)
 		verify.createSession(res);
