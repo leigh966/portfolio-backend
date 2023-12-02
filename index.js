@@ -6,6 +6,30 @@ const app = express()
 app.use(express.json());
 require('dotenv').config()
 
+
+app.get('/projects', (req, res) => {
+	const pgClient = require("./postgres_client").client;
+	if(!verify.sessionId(req.headers.session_id))
+	{
+		res.status(401);
+		res.send("Authentication Failed")
+		return;
+	}
+	pgClient.query("SELECT * FROM projects").then((dbRes)=>
+		{
+			id = dbRes.rows[0].id;
+			if(id)
+			{
+				res.status(200);
+				res.send(dbRes.rows);
+				return;
+			}
+			res.status(500);
+			res.send("Error reading db");
+		}
+	)
+})
+
 app.post('/project', (req, res) => {
 	const pgClient = require("./postgres_client").client;
 	const json = req.body;
