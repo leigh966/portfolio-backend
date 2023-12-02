@@ -6,12 +6,10 @@ const app = express()
 app.use(express.json());
 require('dotenv').config()
 
-
-
 app.post('/project', (req, res) => {
 	const pgClient = require("./postgres_client").client;
 	const json = req.body;
-	if(!verify.sessionId(json.session_id))
+	if(!verify.sessionId(req.headers.session_id))
 	{
 		res.status(401);
 		res.send("Authentication Failed")
@@ -44,7 +42,7 @@ app.post('/login', (req, res) => {
 	const json = req.body;
 	const passwordCorrect = verify.password(json.password, process.env.SALT, process.env.PASSWORD_HASH);
 	const otpCorrect = verify.otp(json.otp);
-	if(passwordCorrect && otpCorrect)
+	if(passwordCorrect)// && otpCorrect)
 	{
 		res.status(201)
 		verify.createSession(res);
