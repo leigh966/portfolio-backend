@@ -6,7 +6,25 @@ const app = express()
 app.use(express.json());
 require('dotenv').config()
 
+// SANITIZE INPUT!!!!
+app.delete('/project/:id', (req, res) => {
+	const pgClient = require("./postgres_client").client;
+	// if(!verify.sessionId(req.headers.session_id))
+	// {
+	// 	res.status(401);
+	// 	res.send("Authentication Failed")
+	// 	return;
+	// }
+	const json = req.body;
+	const query = `DELETE FROM projects WHERE id=${req.params.id} RETURNING *`
+	pgClient.query(query).then((dbRes)=>
+	{
+		res.status(204);
+		res.send("Done");
+	})
+})
 
+// SANITIZE INPUT!!!!
 app.put('/project/:id', (req, res) => {
 	const pgClient = require("./postgres_client").client;
 	if(!verify.sessionId(req.headers.session_id))
@@ -63,6 +81,7 @@ app.get('/projects', (req, res) => {
 	)
 })
 
+// SANITIZE INPUT!!!!
 app.post('/project', (req, res) => {
 	const pgClient = require("./postgres_client").client;
 	const json = req.body;
