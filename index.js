@@ -9,6 +9,19 @@ require('dotenv').config()
 // Including crypto module
 const crypto = require('crypto');
 
+
+// Connect to postgres db
+const pg = require("pg");
+const pgClient = new pg.Client({
+	user: process.env.PGUSER,
+	host: process.env.PGHOST,
+	database: process.env.PGDATABASE,
+	password: process.env.PGPASSWORD,
+	port: process.env.PGPORT,
+});
+pgClient.connect();
+
+
 var sessionId = null;
 
 
@@ -34,6 +47,7 @@ crypto.randomBytes(127, (err, buf) => {
 });
 }
 const verifyOTP = require("./verify");
+const { Console } = require("console");
 app.post('/login', (req, res) => {
 	const json = req.body;
 	const passwordCorrect = comparePassword(json.password, process.env.SALT, process.env.PASSWORD_HASH);
