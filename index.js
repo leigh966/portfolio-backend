@@ -9,12 +9,12 @@ require('dotenv').config()
 // SANITIZE INPUT!!!!
 app.delete('/project/:id', (req, res) => {
 	const pgClient = require("./postgres_client").client;
-	// if(!verify.sessionId(req.headers.session_id))
-	// {
-	// 	res.status(401);
-	// 	res.send("Authentication Failed")
-	// 	return;
-	// }
+	if(!verify.sessionId(req.headers.session_id))
+	{
+		res.status(401);
+		res.send("Authentication Failed")
+		return;
+	}
 	const json = req.body;
 	const query = `DELETE FROM projects WHERE id=${req.params.id} RETURNING *`
 	pgClient.query(query).then((dbRes)=>
