@@ -7,6 +7,30 @@ app.use(express.json());
 require('dotenv').config()
 
 
+app.put('/project/:id', (req, res) => {
+	const pgClient = require("./postgres_client").client;
+	if(!verify.sessionId(req.headers.session_id))
+	{
+		res.status(401);
+		res.send("Authentication Failed")
+		return;
+	}
+	const json = req.body;
+	const query = `UPDATE projects SET name='${json.name}', description='${json.description}', last_updated=now() WHERE id=${req.params.id} RETURNING *`
+	pgClient.query(query).then((dbRes)=>
+	{
+		id = dbRes.rows[0].id;
+		if(id)
+		{
+			res.status(200);
+			res.send(dbRes.rows[0]);
+			return;
+		}
+		res.status(500);
+		res.send("Error writing to db");
+	})
+})
+
 app.get('/projects', (req, res) => {
 	const pgClient = require("./postgres_client").client;
 	if(!verify.sessionId(req.headers.session_id))
