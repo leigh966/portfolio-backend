@@ -3,6 +3,7 @@ const speakeasy = require("speakeasy");
 dotenv.config();
 
 const key = process.env.SECRET_KEY
+var sessionId = null;
 
 // Including crypto module
 const crypto = require('crypto');
@@ -23,6 +24,11 @@ function verifyPassword(password, storedSalt, storedHash)
     return storedHash === hash;
   }
 
+function verifySessionId(givenSessionId)
+{
+  return givenSessionId == sessionId && sessionId != null
+}
+
 function generateSessionId(res)
 {
 	
@@ -42,3 +48,4 @@ crypto.randomBytes(127, (err, buf) => {
 module.exports.otp = verifyOTP;
 module.exports.password = verifyPassword;
 module.exports.createSession = generateSessionId;
+module.exports.sessionId = verifySessionId;

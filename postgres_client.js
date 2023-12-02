@@ -1,6 +1,7 @@
 require('dotenv').config()
 
-
+function getClient()
+{
 // Connect to postgres db
 const pg = require("pg");
 const pgClient = new pg.Client({
@@ -11,5 +12,7 @@ const pgClient = new pg.Client({
 	port: process.env.PGPORT,
 });
 pgClient.connect();
-require("./setup_table").setup(pgClient);
-module.exports.client = pgClient;
+//require("./setup_table").setup(pgClient);
+return pgClient;
+}
+module.exports.client = getClient();
