@@ -17,15 +17,24 @@ app.get('/projects', (req, res) => {
 	}
 	pgClient.query("SELECT * FROM projects").then((dbRes)=>
 		{
-			id = dbRes.rows[0].id;
+			var id;
+			try
+			{
+				id = dbRes.rows[0].id;
+			}
+			catch
+			{
+				id = null;
+			}
+			
 			if(id)
 			{
 				res.status(200);
 				res.send(dbRes.rows);
 				return;
 			}
-			res.status(500);
-			res.send("Error reading db");
+			res.status(200);
+			res.send("[]");
 		}
 	)
 })
