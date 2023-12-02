@@ -6,23 +6,14 @@ const app = express()
 app.use(express.json());
 require('dotenv').config()
 
-
-
-
-// Connect to postgres db
-const pg = require("pg");
-const pgClient = new pg.Client({
-	user: process.env.PGUSER,
-	host: process.env.PGHOST,
-	database: process.env.PGDATABASE,
-	password: process.env.PGPASSWORD,
-	port: process.env.PGPORT,
-});
-pgClient.connect();
-
+pgClient = require("./postgres_client").client;
 
 var sessionId = null;
 
+
+app.post('/project', (req, res) => {
+
+})
 
 
 const verify = require("./verify");
