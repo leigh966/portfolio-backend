@@ -33,6 +33,25 @@ function removeDangerousCharacters(s)
 	return output;
 }
 
+function restoreDangerousCharacters(s)
+{
+	const list = s.split("#");
+	let output = ""
+	for(let i = 0; i < list.length; i++)
+	{
+		if(i%2==1)
+		{
+			output+=String.fromCharCode(list[i])
+		}
+		else
+		{
+			output+=list[i];
+		}
+	}
+	console.log(output);
+	return output;
+}
+
 app.delete('/project/:id', (req, res) => {
 	const pgClient = require("./postgres_client").client;
 	if(!verify.sessionId(req.headers.session_id))
@@ -91,8 +110,17 @@ app.get('/projects', (req, res) => {
 			
 			if(id)
 			{
+				output = []
+				for(let i = 0; i<dbRes.rows.length;i++)
+				{
+					let outputRow = {};
+					outputRow.name = restoreDangerousCharacters(dbRes.rows[i].name);
+					outputRow.description = restoreDangerousCharacters(dbRes.rows[i].description)
+					outputRow.last_updated = dbRes.rows[i].last_updated
+					output.push(outputRow);
+				}
 				res.status(200);
-				res.send(dbRes.rows);
+				res.send(JSON.stringify(output));
 				return;
 			}
 			res.status(200);
