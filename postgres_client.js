@@ -4,7 +4,7 @@ function getClient()
 {
 // Connect to postgres db
 const pg = require("pg");
-const pgClient = new pg.Client(process.env.DATABASE_URL+"sslmode=require");
+const pgClient = new pg.Client(process.env.DATABASE_URL);
 pgClient.connect();
 //require("./setup_table").setup(pgClient);
 return pgClient;

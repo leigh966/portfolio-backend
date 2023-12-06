@@ -5,6 +5,8 @@ const app = express()
 
 app.use(express.json());
 require('dotenv').config()
+const sanitizer = require('sanitize');
+app.use(sanitizer.middleware);
 
 // SANITIZE INPUT!!!!
 app.delete('/project/:id', (req, res) => {
@@ -16,7 +18,7 @@ app.delete('/project/:id', (req, res) => {
 		return;
 	}
 	const json = req.body;
-	const query = `DELETE FROM projects WHERE id=${req.params.id} RETURNING *`
+	const query = `DELETE FROM projects WHERE id=${req.paramInt("id")} RETURNING *`
 	pgClient.query(query).then((dbRes)=>
 	{
 		res.status(204);
@@ -27,6 +29,8 @@ app.delete('/project/:id', (req, res) => {
 // SANITIZE INPUT!!!!
 app.put('/project/:id', (req, res) => {
 	const pgClient = require("./postgres_client").client;
+	const name = req.bodyString("name")
+	console.log(name);
 	if(!verify.sessionId(req.headers.session_id))
 	{
 		res.status(401);
@@ -34,7 +38,7 @@ app.put('/project/:id', (req, res) => {
 		return;
 	}
 	const json = req.body;
-	const query = `UPDATE projects SET name='${json.name}', description='${json.description}', last_updated=now() WHERE id=${req.params.id} RETURNING *`
+	const query = `UPDATE projects SET name='${json.name}', description='${json.description}', last_updated=now() WHERE id=${req.paramInt("id")} RETURNING *`
 	pgClient.query(query).then((dbRes)=>
 	{
 		id = dbRes.rows[0].id;
@@ -82,7 +86,7 @@ app.get('/projects', (req, res) => {
 })
 
 // SANITIZE INPUT!!!!
-app.post('/project', (req, res) => {
+app.post('/project',(req, res) => {
 	const pgClient = require("./postgres_client").client;
 	const json = req.body;
 	if(!verify.sessionId(req.headers.session_id))
