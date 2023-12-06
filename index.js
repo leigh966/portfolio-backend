@@ -72,12 +72,6 @@ app.put('/project/:id', (req, res) => {
 
 app.get('/projects', (req, res) => {
 	const pgClient = require("./postgres_client").client;
-	if(!verify.sessionId(req.headers.session_id))
-	{
-		res.status(401);
-		res.send("Authentication Failed")
-		return;
-	}
 	pgClient.query("SELECT * FROM projects").then((dbRes)=>
 		{
 			var id;
