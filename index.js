@@ -8,7 +8,26 @@ require('dotenv').config()
 const sanitizer = require('sanitize');
 app.use(sanitizer.middleware);
 
-// SANITIZE INPUT!!!!
+const lowerCase = "qwertyuiopasdfghjklzxcvbnmm";
+const upperCase = lowerCase.toUpperCase();
+const allowedCharacters = lowerCase+upperCase+"1234567890"
+function removeDangerousCharacters(s)
+{
+	let output = "";
+	for(let i = 0; i < s.length; i++)
+	{
+		if(!(allowedCharacters.includes(s[i])))
+		{
+			const replacement = `#${s.charCodeAt(i)}#`
+			output+=replacement;
+		}
+		else{
+			output+=s[i];
+		}
+	}
+	return output;
+}
+
 app.delete('/project/:id', (req, res) => {
 	const pgClient = require("./postgres_client").client;
 	if(!verify.sessionId(req.headers.session_id))
@@ -17,7 +36,6 @@ app.delete('/project/:id', (req, res) => {
 		res.send("Authentication Failed")
 		return;
 	}
-	const json = req.body;
 	const query = `DELETE FROM projects WHERE id=${req.paramInt("id")} RETURNING *`
 	pgClient.query(query).then((dbRes)=>
 	{
@@ -26,19 +44,18 @@ app.delete('/project/:id', (req, res) => {
 	})
 })
 
-// SANITIZE INPUT!!!!
+
 app.put('/project/:id', (req, res) => {
 	const pgClient = require("./postgres_client").client;
-	const name = req.bodyString("name")
-	console.log(name);
 	if(!verify.sessionId(req.headers.session_id))
 	{
 		res.status(401);
 		res.send("Authentication Failed")
 		return;
 	}
-	const json = req.body;
-	const query = `UPDATE projects SET name='${json.name}', description='${json.description}', last_updated=now() WHERE id=${req.paramInt("id")} RETURNING *`
+	const name = removeDangerousCharacters(req.bodyString("name"))
+	const description = removeDangerousCharacters(req.bodyString("description"));
+	const query = `UPDATE projects SET name='${name}', description='${description}', last_updated=now() WHERE id=${req.paramInt("id")} RETURNING *`
 	pgClient.query(query).then((dbRes)=>
 	{
 		id = dbRes.rows[0].id;
@@ -85,7 +102,6 @@ app.get('/projects', (req, res) => {
 	)
 })
 
-// SANITIZE INPUT!!!!
 app.post('/project',(req, res) => {
 	const pgClient = require("./postgres_client").client;
 	const json = req.body;
@@ -96,7 +112,7 @@ app.post('/project',(req, res) => {
 		return;
 	}
 	const text = 'INSERT INTO projects(name, description) VALUES($1, $2) RETURNING *'
-	const values = [json.name, json.description]
+	const values = [removeDangerousCharacters(json.name), removeDangerousCharacters(json.description)]
 
 	pgClient.query(text, values).then((dbRes) =>
 		{
@@ -121,7 +137,7 @@ const { client } = require("./postgres_client");
 app.post('/login', (req, res) => {
 	const json = req.body;
 	const passwordCorrect = verify.password(json.password, process.env.SALT, process.env.PASSWORD_HASH);
-	const otpCorrect = verify.otp(json.otp);
+	const otpCorrect = verify.otp(req.bodyInt("otp"));
 	if(passwordCorrect && otpCorrect)
 	{
 		res.status(201)
