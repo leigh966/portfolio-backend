@@ -82,8 +82,7 @@ app.put('/project/:id', (req, res) => {
 	const query = `UPDATE projects SET name='${name}', description='${description}', last_updated=now() WHERE id=${req.paramInt("id")} RETURNING *`
 	pgClient.query(query).then((dbRes)=>
 	{
-		id = dbRes.rows[0].id;
-		if(id)
+		if(dbRes.rows.length>0)
 		{
 			res.status(200);
 			res.send(dbRes.rows[0]);
@@ -98,18 +97,7 @@ app.get('/projects', (req, res) => {
 	const pgClient = require("./postgres_client").getClient();
 	pgClient.query("SELECT * FROM projects").then((dbRes)=>
 		{
-			var id;
-			try
-			{
-				id = dbRes.rows[0].id;
-			}
-			catch
-			{
-				id = null;
-			}
-			
-			if(id)
-			{
+
 				output = []
 				for(let i = 0; i<dbRes.rows.length;i++)
 				{
@@ -122,9 +110,7 @@ app.get('/projects', (req, res) => {
 				res.status(200);
 				res.send(JSON.stringify(output));
 				return;
-			}
-			res.status(200);
-			res.send("[]");
+
 		}
 	)
 })
@@ -143,15 +129,14 @@ app.post('/project',(req, res) => {
 
 	pgClient.query(text, values).then((dbRes) =>
 		{
-			id = dbRes.rows[0].id;
-			if(id)
+			if(dbRes.rows.length>0)
 			{
 				res.status(201);
 				res.send(dbRes.rows[0]);
 				return;
 			}
 			res.status(500);
-			res.send("Error writing to db");
+			res.send("Error writing to db - is your id correct?");
 		}
 	);
 
