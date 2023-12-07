@@ -9,7 +9,7 @@ const pgClient = new pg.Client({
   ssl: { rejectUnauthorized: false }
 });
 pgClient.connect();
-require("./setup_table").setup(pgClient);
+//require("./setup_table").setup(pgClient);
 return pgClient;
 }
 module.exports.getClient = getClient;
