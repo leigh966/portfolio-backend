@@ -89,7 +89,7 @@ app.put('/project/:id', (req, res) => {
 			return;
 		}
 		res.status(500);
-		res.send("Error writing to db");
+		res.send("Error writing to db - is your id correct?");
 	})
 })
 
@@ -136,7 +136,7 @@ app.post('/project',(req, res) => {
 				return;
 			}
 			res.status(500);
-			res.send("Error writing to db - is your id correct?");
+			res.send("Error writing to db");
 		}
 	);
 
