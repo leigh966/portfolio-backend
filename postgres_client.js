@@ -12,4 +12,4 @@ pgClient.connect();
 require("./setup_table").setup(pgClient);
 return pgClient;
 }
-module.exports.client = getClient();
+module.exports.getClient = getClient;

@@ -53,7 +53,7 @@ function restoreDangerousCharacters(s)
 }
 
 app.delete('/project/:id', (req, res) => {
-	const pgClient = require("./postgres_client").client;
+	const pgClient = require("./postgres_client").getClient();
 	if(!verify.sessionId(req.headers.session_id))
 	{
 		res.status(401);
@@ -70,7 +70,7 @@ app.delete('/project/:id', (req, res) => {
 
 
 app.put('/project/:id', (req, res) => {
-	const pgClient = require("./postgres_client").client;
+	const pgClient = require("./postgres_client").getClient();
 	if(!verify.sessionId(req.headers.session_id))
 	{
 		res.status(401);
@@ -95,7 +95,7 @@ app.put('/project/:id', (req, res) => {
 })
 
 app.get('/projects', (req, res) => {
-	const pgClient = require("./postgres_client").client;
+	const pgClient = require("./postgres_client").getClient();
 	pgClient.query("SELECT * FROM projects").then((dbRes)=>
 		{
 			var id;
@@ -130,7 +130,7 @@ app.get('/projects', (req, res) => {
 })
 
 app.post('/project',(req, res) => {
-	const pgClient = require("./postgres_client").client;
+	const pgClient = require("./postgres_client").getClient();
 	const json = req.body;
 	if(!verify.sessionId(req.headers.session_id))
 	{
