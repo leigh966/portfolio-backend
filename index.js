@@ -1,10 +1,12 @@
 // Importing express module
-const express = require("express");
+import express from "express";
 const app = express();
+import { getClient } from "./postgres_client.js";
 
 app.use(express.json());
-require("dotenv").config();
-const sanitizer = require("sanitize");
+import { config } from "dotenv";
+config();
+import sanitizer from "sanitize";
 app.use(sanitizer.middleware);
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -45,7 +47,7 @@ function restoreDangerousCharacters(s) {
 }
 
 app.delete("/project/:id", (req, res) => {
-  const pgClient = require("./postgres_client").getClient();
+  const pgClient = getClient();
   if (!verify.sessionId(req.headers.session_id)) {
     res.status(401);
     res.send("Authentication Failed");
@@ -61,7 +63,7 @@ app.delete("/project/:id", (req, res) => {
 });
 
 app.put("/project/:id", (req, res) => {
-  const pgClient = require("./postgres_client").getClient();
+  const pgClient = getClient();
   if (!verify.sessionId(req.headers.session_id)) {
     res.status(401);
     res.send("Authentication Failed");
@@ -85,9 +87,9 @@ app.put("/project/:id", (req, res) => {
 });
 
 app.get("/projects", (req, res) => {
-  const pgClient = require("./postgres_client").getClient();
+  const pgClient = getClient();
   pgClient.query("SELECT * FROM projects").then((dbRes) => {
-    output = [];
+    let output = [];
     for (let i = 0; i < dbRes.rows.length; i++) {
       let outputRow = {};
       outputRow.id = dbRes.rows[i].id;
@@ -106,7 +108,7 @@ app.get("/projects", (req, res) => {
 });
 
 app.post("/project", (req, res) => {
-  const pgClient = require("./postgres_client").getClient();
+  const pgClient = getClient();
   const json = req.body;
   if (!verify.sessionId(req.headers.session_id)) {
     res.status(401);
@@ -132,9 +134,9 @@ app.post("/project", (req, res) => {
   });
 });
 
-const verify = require("./verify");
-const { Console } = require("console");
-const { client } = require("./postgres_client");
+import verify from "./verify.js";
+import Console from "console";
+
 app.post("/login", (req, res) => {
   const json = req.body;
   const passwordCorrect = verify.password(
@@ -151,7 +153,7 @@ app.post("/login", (req, res) => {
   res.status(401);
   res.send("Failed To Authenticate");
 });
-//require("./setup_table").setup(require("./postgres_client").getClient()); // setup table
+//require("./setup_table").setup(getClient()); // setup table
 // Server setup
 app.listen(process.env.PORT, () => {
   console.log("Server is Running");
