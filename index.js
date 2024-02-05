@@ -2,8 +2,10 @@
 import express from "express";
 const app = express();
 import { getClient } from "./postgres_client.js";
+import multer from "multer";
 
 app.use(express.json());
+
 import { config } from "dotenv";
 config();
 import sanitizer from "sanitize";
@@ -45,6 +47,56 @@ function restoreDangerousCharacters(s) {
   }
   return output;
 }
+
+import fs from "fs";
+app.post("/image", function (request, response) {
+  if (!verify.sessionId(request.headers.session_id)) {
+    response.status(401);
+    response.send("Authentication Failed");
+    return;
+  }
+  let uuid = uuidv4().toString();
+  var filename = "";
+
+  var storage = multer.diskStorage({
+    // maybe change this to memory storage as it may be quicker
+    destination: function (request, file, callback) {
+      callback(null, "./temp");
+    },
+
+    filename: function (request, file, callback) {
+      var temp_file_arr = file.originalname.split(".");
+
+      var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
+      filename = uuid + "." + temp_file_extension;
+      callback(null, filename);
+    },
+  });
+
+  var upload = multer({ storage: storage }).single("image");
+
+  upload(request, response, function (error) {
+    if (error) {
+      response.status(500);
+      console.log(error);
+      response.send("Error Uploading File");
+    } else {
+      fs.readFile("./temp/" + filename, "utf-8", (error, f) => {
+        if (error) {
+          response.status(500);
+          console.log(error);
+          response.send("Error Uploading File");
+          return;
+        }
+        uploadFileToAWS(f, filename).then((awsRes) => {
+          // should probably clean up the temp file here
+          response.status(201);
+          response.send(filename);
+        });
+      });
+    }
+  });
+});
 
 app.delete("/project/:id", (req, res) => {
   const pgClient = getClient();
@@ -107,6 +159,7 @@ app.get("/projects", (req, res) => {
   });
 });
 
+import { v4 as uuidv4 } from "uuid";
 app.post("/project", (req, res) => {
   const pgClient = getClient();
   const json = req.body;
@@ -115,6 +168,7 @@ app.post("/project", (req, res) => {
     res.send("Authentication Failed");
     return;
   }
+
   const text =
     "INSERT INTO projects(name, description, tagline) VALUES($1, $2, $3) RETURNING *";
   const values = [
@@ -136,6 +190,23 @@ app.post("/project", (req, res) => {
 
 import verify from "./verify.js";
 import Console from "console";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+async function uploadFileToAWS(file, key) {
+  let client = new S3Client({
+    region: "eu-north-1",
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
+  const input = {
+    Body: file,
+    Bucket: process.env.S3_BUCKET,
+    Key: key,
+  };
+  const command = new PutObjectCommand(input);
+  return client.send(command);
+}
 
 app.post("/login", (req, res) => {
   const json = req.body;
