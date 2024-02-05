@@ -6,6 +6,19 @@ import multer from "multer";
 
 app.use(express.json());
 
+import {
+  PutObjectCommand,
+  S3Client,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
+let aws_client = new S3Client({
+  region: "eu-north-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
 import { config } from "dotenv";
 config();
 import sanitizer from "sanitize";
@@ -169,6 +182,46 @@ app.post("/project", (req, res) => {
     return;
   }
 
+  // if an image_filename is given
+  if (req.body["image_filename"] != null) {
+    console.log("trying to fetch image from aws");
+    let command = new GetObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: req.body["image_filename"],
+    });
+    aws_client
+      .send(command)
+      .then(() => {
+        const text =
+          "INSERT INTO projects(name, description, tagline, image_filename) VALUES($1, $2, $3, $4) RETURNING *";
+        const values = [
+          removeDangerousCharacters(json.name),
+          removeDangerousCharacters(json.description),
+          removeDangerousCharacters(json.tagline),
+          removeDangerousCharacters(req.body["image_filename"]),
+        ];
+
+        pgClient.query(text, values).then((dbRes) => {
+          if (dbRes.rows.length > 0) {
+            res.status(201);
+            res.send(dbRes.rows[0]);
+            return;
+          }
+          res.status(500);
+          res.send("Error writing to db");
+        });
+      })
+      .catch((err) => {
+        if (err.Code == "NoSuchKey") {
+          res.status(404);
+          res.send("The referenced image does not exist");
+        } else {
+          console.log(err);
+        }
+      });
+    return;
+  }
+
   const text =
     "INSERT INTO projects(name, description, tagline) VALUES($1, $2, $3) RETURNING *";
   const values = [
@@ -190,22 +243,14 @@ app.post("/project", (req, res) => {
 
 import verify from "./verify.js";
 import Console from "console";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 async function uploadFileToAWS(file, key) {
-  let client = new S3Client({
-    region: "eu-north-1",
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-  });
   const input = {
     Body: file,
     Bucket: process.env.S3_BUCKET,
     Key: key,
   };
   const command = new PutObjectCommand(input);
-  return client.send(command);
+  return aws_client.send(command);
 }
 
 app.post("/login", (req, res) => {
@@ -225,6 +270,8 @@ app.post("/login", (req, res) => {
   res.send("Failed To Authenticate");
 });
 //require("./setup_table").setup(getClient()); // setup table
+import setup_table from "./setup_table.js";
+setup_table(getClient());
 // Server setup
 app.listen(process.env.PORT, () => {
   console.log("Server is Running");
