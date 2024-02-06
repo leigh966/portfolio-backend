@@ -2,22 +2,14 @@
 import express from "express";
 const app = express();
 import { getClient } from "./postgres_client.js";
-import multer from "multer";
-
+import { upload_image, get_image } from "./images.js";
 app.use(express.json());
 
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 import {
-  PutObjectCommand,
-  S3Client,
-  GetObjectCommand,
-} from "@aws-sdk/client-s3";
-let aws_client = new S3Client({
-  region: "eu-north-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+  client as aws_client,
+  handleGetObjectError,
+} from "./aws-operations.js";
 
 import { config } from "dotenv";
 config();
@@ -61,55 +53,7 @@ function restoreDangerousCharacters(s) {
   return output;
 }
 
-import fs from "fs";
-app.post("/image", function (request, response) {
-  if (!verify.sessionId(request.headers.session_id)) {
-    response.status(401);
-    response.send("Authentication Failed");
-    return;
-  }
-  let uuid = uuidv4().toString();
-  var filename = "";
-
-  var storage = multer.diskStorage({
-    // maybe change this to memory storage as it may be quicker
-    destination: function (request, file, callback) {
-      callback(null, "./temp");
-    },
-
-    filename: function (request, file, callback) {
-      var temp_file_arr = file.originalname.split(".");
-
-      var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
-      filename = uuid + "." + temp_file_extension;
-      callback(null, filename);
-    },
-  });
-
-  var upload = multer({ storage: storage }).single("image");
-
-  upload(request, response, function (error) {
-    if (error) {
-      response.status(500);
-      console.log(error);
-      response.send("Error Uploading File");
-    } else {
-      fs.readFile("./temp/" + filename, "utf-8", (error, f) => {
-        if (error) {
-          response.status(500);
-          console.log(error);
-          response.send("Error Uploading File");
-          return;
-        }
-        uploadFileToAWS(f, filename).then((awsRes) => {
-          // should probably clean up the temp file here
-          response.status(201);
-          response.send(filename);
-        });
-      });
-    }
-  });
-});
+app.post("/image", upload_image);
 
 app.delete("/project/:id", (req, res) => {
   const pgClient = getClient();
@@ -172,18 +116,6 @@ app.get("/projects", (req, res) => {
   });
 });
 
-function handleGetObjectError(err, res) {
-  if (err.Code == "NoSuchKey") {
-    res.status(404);
-    res.send("The referenced image does not exist");
-  } else {
-    console.log(err);
-    res.status(500);
-    res.send("Error fetching from aws");
-  }
-}
-
-import { v4 as uuidv4 } from "uuid";
 app.post("/project", (req, res) => {
   const pgClient = getClient();
   const json = req.body;
@@ -249,15 +181,6 @@ app.post("/project", (req, res) => {
 
 import verify from "./verify.js";
 import Console from "console";
-async function uploadFileToAWS(file, key) {
-  const input = {
-    Body: file,
-    Bucket: process.env.S3_BUCKET,
-    Key: key,
-  };
-  const command = new PutObjectCommand(input);
-  return aws_client.send(command);
-}
 
 app.post("/login", (req, res) => {
   const json = req.body;
@@ -277,50 +200,7 @@ app.post("/login", (req, res) => {
 });
 
 import path from "path";
-app.get("/image/:filename", (req, res) => {
-  const filename = req.paramString("filename");
-  let command = new GetObjectCommand({
-    Bucket: process.env.S3_BUCKET,
-    Key: filename,
-  });
-  aws_client
-    .send(command)
-    .then((awsResponse) => {
-      res.status(200);
-      //console.log(awsResponse.Body);
-      //res.send(awsResponse.Body);
-      const splitFn = filename.split(".");
-      res.type(splitFn[splitFn.length - 1]);
-      const options = {
-        root: path.join("temp"),
-      };
-      let filePath = "temp/" + filename;
-      function resolve() {
-        res.sendFile(filename, options);
-      }
-      let file = fs.createWriteStream(filePath);
-      // Attach a 'data' listener to add the chunks of data to our array
-      // Each chunk is a Buffer instance
-      awsResponse.Body.on("data", (chunk) => {
-        file.write(chunk);
-      });
-
-      // Once the stream has no more data, join the chunks into a string and return the string
-      awsResponse.Body.once("end", resolve);
-
-      // responseDataChunks.forEach((element) => {
-      //   res.send(Buffer.from(element));
-      // });
-
-      //res.type(filename.split(".")[filename.length - 1]);
-      // awsResponse.Body.arrayBuffer().then((buf) => {
-      //   res.send(Buffer.from(buf));
-      // });
-    })
-    .catch((err) => {
-      handleGetObjectError(err, res);
-    });
-});
+app.get("/image/:filename", get_image);
 
 //require("./setup_table").setup(getClient()); // setup table
 import setup_table from "./setup_table.js";
