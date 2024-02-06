@@ -172,6 +172,17 @@ app.get("/projects", (req, res) => {
   });
 });
 
+function handleGetObjectError(err, res) {
+  if (err.Code == "NoSuchKey") {
+    res.status(404);
+    res.send("The referenced image does not exist");
+  } else {
+    console.log(err);
+    res.status(500);
+    res.send("Error fetching from aws");
+  }
+}
+
 import { v4 as uuidv4 } from "uuid";
 app.post("/project", (req, res) => {
   const pgClient = getClient();
@@ -212,12 +223,7 @@ app.post("/project", (req, res) => {
         });
       })
       .catch((err) => {
-        if (err.Code == "NoSuchKey") {
-          res.status(404);
-          res.send("The referenced image does not exist");
-        } else {
-          console.log(err);
-        }
+        handleGetObjectError(err, res);
       });
     return;
   }
@@ -269,6 +275,53 @@ app.post("/login", (req, res) => {
   res.status(401);
   res.send("Failed To Authenticate");
 });
+
+import path from "path";
+app.get("/image/:filename", (req, res) => {
+  const filename = req.paramString("filename");
+  let command = new GetObjectCommand({
+    Bucket: process.env.S3_BUCKET,
+    Key: filename,
+  });
+  aws_client
+    .send(command)
+    .then((awsResponse) => {
+      res.status(200);
+      //console.log(awsResponse.Body);
+      //res.send(awsResponse.Body);
+      const splitFn = filename.split(".");
+      res.type(splitFn[splitFn.length - 1]);
+      const options = {
+        root: path.join("temp"),
+      };
+      let filePath = "temp/" + filename;
+      function resolve() {
+        res.sendFile(filename, options);
+      }
+      let file = fs.createWriteStream(filePath);
+      // Attach a 'data' listener to add the chunks of data to our array
+      // Each chunk is a Buffer instance
+      awsResponse.Body.on("data", (chunk) => {
+        file.write(chunk);
+      });
+
+      // Once the stream has no more data, join the chunks into a string and return the string
+      awsResponse.Body.once("end", resolve);
+
+      // responseDataChunks.forEach((element) => {
+      //   res.send(Buffer.from(element));
+      // });
+
+      //res.type(filename.split(".")[filename.length - 1]);
+      // awsResponse.Body.arrayBuffer().then((buf) => {
+      //   res.send(Buffer.from(buf));
+      // });
+    })
+    .catch((err) => {
+      handleGetObjectError(err, res);
+    });
+});
+
 //require("./setup_table").setup(getClient()); // setup table
 import setup_table from "./setup_table.js";
 setup_table(getClient());
