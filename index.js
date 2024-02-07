@@ -199,7 +199,6 @@ app.post("/login", (req, res) => {
   res.send("Failed To Authenticate");
 });
 
-import path from "path";
 app.get("/image/:filename", get_image);
 
 //require("./setup_table").setup(getClient()); // setup table

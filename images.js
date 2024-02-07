@@ -7,6 +7,7 @@ import {
   handleGetObjectError,
 } from "./aws-operations.js";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
+import path from "path";
 
 export function upload_image(request, response) {
   // if (!verify.sessionId(request.headers.session_id)) {
