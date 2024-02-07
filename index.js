@@ -114,6 +114,10 @@ app.get("/projects", (req, res) => {
       );
       outputRow.last_updated = dbRes.rows[i].last_updated;
       outputRow.tagline = restoreDangerousCharacters(dbRes.rows[i].tagline);
+      outputRow.image_filename = dbRes.rows[i].image_filename
+        ? restoreDangerousCharacters(dbRes.rows[i].image_filename)
+        : null;
+
       output.push(outputRow);
     }
     res.status(200);
