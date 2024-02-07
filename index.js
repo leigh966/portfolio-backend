@@ -4,6 +4,7 @@ const app = express();
 import { getClient } from "./postgres_client.js";
 import { upload_image, get_image } from "./images.js";
 import multer from "multer";
+import { getAllProjects } from "./project-fetching.js";
 
 app.use(express.json());
 
@@ -41,19 +42,6 @@ function removeDangerousCharacters(s) {
       output += replacement;
     } else {
       output += s[i];
-    }
-  }
-  return output;
-}
-
-function restoreDangerousCharacters(s) {
-  const list = s.split("#");
-  let output = "";
-  for (let i = 0; i < list.length; i++) {
-    if (i % 2 == 1) {
-      output += String.fromCharCode(list[i]);
-    } else {
-      output += list[i];
     }
   }
   return output;
@@ -101,30 +89,7 @@ app.put("/project/:id", (req, res) => {
   });
 });
 
-app.get("/projects", (req, res) => {
-  const pgClient = getClient();
-  pgClient.query("SELECT * FROM projects").then((dbRes) => {
-    let output = [];
-    for (let i = 0; i < dbRes.rows.length; i++) {
-      let outputRow = {};
-      outputRow.id = dbRes.rows[i].id;
-      outputRow.name = restoreDangerousCharacters(dbRes.rows[i].name);
-      outputRow.description = restoreDangerousCharacters(
-        dbRes.rows[i].description
-      );
-      outputRow.last_updated = dbRes.rows[i].last_updated;
-      outputRow.tagline = restoreDangerousCharacters(dbRes.rows[i].tagline);
-      outputRow.image_filename = dbRes.rows[i].image_filename
-        ? restoreDangerousCharacters(dbRes.rows[i].image_filename)
-        : null;
-
-      output.push(outputRow);
-    }
-    res.status(200);
-    res.send(JSON.stringify(output));
-    return;
-  });
-});
+app.get("/projects", getAllProjects);
 
 app.post("/project", (req, res) => {
   const pgClient = getClient();
