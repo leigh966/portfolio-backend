@@ -3,6 +3,8 @@ import express from "express";
 const app = express();
 import { getClient } from "./postgres_client.js";
 import { upload_image, get_image } from "./images.js";
+import multer from "multer";
+
 app.use(express.json());
 
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -14,6 +16,10 @@ import {
 import { config } from "dotenv";
 config();
 import sanitizer from "sanitize";
+
+var storage = multer.memoryStorage();
+var upload = multer({ storage: storage });
+
 app.use(sanitizer.middleware);
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -53,7 +59,7 @@ function restoreDangerousCharacters(s) {
   return output;
 }
 
-app.post("/image", upload_image);
+app.post("/image", upload.single("image"), upload_image);
 
 app.delete("/project/:id", (req, res) => {
   const pgClient = getClient();

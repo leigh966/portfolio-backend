@@ -1,4 +1,3 @@
-import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import {
@@ -10,52 +9,20 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import path from "path";
 
 export function upload_image(request, response) {
-  // if (!verify.sessionId(request.headers.session_id)) {
-  //   response.status(401);
-  //   response.send("Authentication Failed");
-  //   return;
-  // }
+  if (!verify.sessionId(request.headers.session_id)) {
+    response.status(401);
+    response.send("Authentication Failed");
+    return;
+  }
   let uuid = uuidv4().toString();
-  var filename = "";
+  var temp_file_arr = request.file.originalname.split(".");
+  var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
+  var filename = uuid + "." + temp_file_extension;
 
-  var storage = multer.diskStorage({
-    // maybe change this to memory storage as it may be quicker
-    destination: function (request, file, callback) {
-      callback(null, "./temp");
-    },
-
-    filename: function (request, file, callback) {
-      var temp_file_arr = file.originalname.split(".");
-
-      var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
-      filename = uuid + "." + temp_file_extension;
-      callback(null, filename);
-    },
-  });
-
-  var upload = multer({ storage: storage }).single("image");
-
-  upload(request, response, function (error) {
-    if (error) {
-      response.status(500);
-      console.log(error);
-      response.send("Error Uploading File");
-    } else {
-      console.log(filename);
-      fs.readFile("./temp/" + filename, "utf-8", (error, f) => {
-        if (error) {
-          response.status(500);
-          console.log(error);
-          response.send("Error Uploading File");
-          return;
-        }
-        uploadFileToAWS(f, filename).then((awsRes) => {
-          // should probably clean up the temp file here
-          response.status(201);
-          response.send(filename);
-        });
-      });
-    }
+  uploadFileToAWS(request.file.buffer, filename).then((awsRes) => {
+    // should probably clean up the temp file here
+    response.status(201);
+    response.send(filename);
   });
 }
 

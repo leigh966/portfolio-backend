@@ -19,12 +19,13 @@ export function handleGetObjectError(err, res) {
   }
 }
 
-export async function uploadFileToAWS(file, key) {
+export function uploadFileToAWS(file, key) {
+  // Set the parameters for the file you want to upload
   const input = {
-    Body: file,
+    Body: file.buffer,
     Bucket: process.env.S3_BUCKET,
     Key: key,
-    ContentEncoding: "utf-8",
+    ContentType: file.mimetype,
   };
   const command = new PutObjectCommand(input);
   return client.send(command);
