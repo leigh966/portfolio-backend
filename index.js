@@ -53,7 +53,10 @@ app.put("/project/:id", (req, res) => {
   const name = removeDangerousCharacters(req.bodyString("name"));
   const description = removeDangerousCharacters(req.bodyString("description"));
   const tagline = removeDangerousCharacters(req.bodyString("tagline"));
-  const query = `UPDATE projects SET name='${name}', tagline='${tagline}', description='${description}', last_updated=now() WHERE id=${req.paramInt(
+  const image_filename = removeDangerousCharacters(
+    req.bodyString("image_filename")
+  );
+  const query = `UPDATE projects SET name='${name}', tagline='${tagline}', description='${description}', last_updated=now(), image_filename='${image_filename}' WHERE id=${req.paramInt(
     "id"
   )} RETURNING *`;
   pgClient.query(query).then((dbRes) => {
@@ -95,6 +98,7 @@ app.get("/image/:filename", get_image);
 
 //require("./setup_table").setup(getClient()); // setup table
 import setup_table from "./setup_table.js";
+import { removeDangerousCharacters } from "./validation.js";
 setup_table(getClient());
 // Server setup
 app.listen(process.env.PORT, () => {
