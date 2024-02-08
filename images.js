@@ -7,6 +7,7 @@ import {
 } from "./aws-operations.js";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import path from "path";
+import verify from "./verify.js";
 
 export function upload_image(request, response) {
   if (!verify.sessionId(request.headers.session_id)) {
