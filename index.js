@@ -5,7 +5,7 @@ import { getClient } from "./postgres_client.js";
 import { upload_image, get_image } from "./images.js";
 import multer from "multer";
 import { getAllProjects } from "./project-fetching.js";
-import { addProject } from "./project-modification.js";
+import { addProject, deleteProject } from "./project-modification.js";
 app.use(express.json());
 
 import { config } from "dotenv";
@@ -27,21 +27,7 @@ app.use(function (req, res, next) {
 
 app.post("/image", upload.single("image"), upload_image);
 
-app.delete("/project/:id", (req, res) => {
-  const pgClient = getClient();
-  if (!verify.sessionId(req.headers.session_id)) {
-    res.status(401);
-    res.send("Authentication Failed");
-    return;
-  }
-  const query = `DELETE FROM projects WHERE id=${req.paramInt(
-    "id"
-  )} RETURNING *`;
-  pgClient.query(query).then((dbRes) => {
-    res.status(204);
-    res.send("Done");
-  });
-});
+app.delete("/project/:id", deleteProject);
 
 app.put("/project/:id", (req, res) => {
   const pgClient = getClient();

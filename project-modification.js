@@ -69,3 +69,19 @@ export function addProject(req, res) {
     res.send("Error writing to db");
   });
 }
+
+export function deleteProject(req, res) {
+  const pgClient = getClient();
+  if (!verify.sessionId(req.headers.session_id)) {
+    res.status(401);
+    res.send("Authentication Failed");
+    return;
+  }
+  const query = `DELETE FROM projects WHERE id=${req.paramInt(
+    "id"
+  )} RETURNING *`;
+  pgClient.query(query).then((dbRes) => {
+    res.status(204);
+    res.send("Done");
+  });
+}
