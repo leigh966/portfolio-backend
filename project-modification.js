@@ -17,7 +17,7 @@ export function addProject(req, res) {
   }
 
   // if an image_filename is given
-  if (req.body["image_filename"] != null) {
+  if (req.body["image_filename"] != null && req.body["image_filename"] != "") {
     console.log("trying to fetch image from aws");
     let command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET,
