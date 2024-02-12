@@ -2,7 +2,7 @@
 import express from "express";
 const app = express();
 import { getClient } from "./postgres_client.js";
-import { upload_image, get_image } from "./images.js";
+import { upload_image, get_image, generateSignedUrl } from "./images.js";
 import multer from "multer";
 import { getAllProjects } from "./project-fetching.js";
 import { addProject, deleteProject } from "./project-modification.js";
@@ -81,6 +81,7 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/image/:filename", get_image);
+app.get("/signed_url/:filename", generateSignedUrl); // will replace above
 
 //require("./setup_table").setup(getClient()); // setup table
 import setup_table from "./setup_table.js";

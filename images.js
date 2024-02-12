@@ -60,3 +60,17 @@ export function get_image(req, res) {
       handleGetObjectError(err, res);
     });
 }
+
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+export async function generateSignedUrl(req, res) {
+  let command = await new GetObjectCommand({
+    Bucket: process.env.S3_BUCKET,
+    Key: req.paramString("filename"),
+    Expires: 60,
+  });
+
+  const url = await getSignedUrl(aws_client, command);
+
+  res.status(200);
+  res.send(url);
+}
