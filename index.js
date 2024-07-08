@@ -7,6 +7,7 @@ import multer from "multer";
 import { getAllProjects } from "./project-fetching.js";
 import { addProject, deleteProject } from "./project-modification.js";
 app.use(express.json());
+app.use(express.static("public"));
 
 import { config } from "dotenv";
 config();
