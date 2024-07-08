@@ -15,11 +15,12 @@ export function upload_image(request, response) {
     response.send("Authentication Failed");
     return;
   }
-  let uuid = uuidv4().toString();
-  var temp_file_arr = request.file.originalname.split(".");
-  var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
-  var filename = uuid + "." + temp_file_extension;
+
   if (process.env.S3_BUCKET != null && process.env.S3_BUCKET != undefined) {
+    let uuid = uuidv4().toString();
+    var temp_file_arr = request.file.originalname.split(".");
+    var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
+    var filename = uuid + "." + temp_file_extension;
     // if using aws
     uploadFileToAWS(request.file.buffer, filename).then((awsRes) => {
       // should probably clean up the temp file here
@@ -28,7 +29,7 @@ export function upload_image(request, response) {
     });
   } else {
     response.status(201);
-    response.send(filename);
+    response.send(request.file.filename);
   }
 }
 
