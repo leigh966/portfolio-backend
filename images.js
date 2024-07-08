@@ -19,12 +19,17 @@ export function upload_image(request, response) {
   var temp_file_arr = request.file.originalname.split(".");
   var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
   var filename = uuid + "." + temp_file_extension;
-
-  uploadFileToAWS(request.file.buffer, filename).then((awsRes) => {
-    // should probably clean up the temp file here
+  if (process.env.S3_BUCKET != null && process.env.S3_BUCKET != undefined) {
+    // if using aws
+    uploadFileToAWS(request.file.buffer, filename).then((awsRes) => {
+      // should probably clean up the temp file here
+      response.status(201);
+      response.send(filename);
+    });
+  } else {
     response.status(201);
     response.send(filename);
-  });
+  }
 }
 
 export function get_image(req, res) {

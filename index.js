@@ -11,8 +11,23 @@ app.use(express.json());
 import { config } from "dotenv";
 config();
 import sanitizer from "sanitize";
-
-var storage = multer.memoryStorage();
+import { v4 as uuidv4 } from "uuid";
+var storage;
+if (process.env.S3_BUCKET) {
+  storage = multer.memoryStorage();
+} else {
+  storage = multer.diskStorage({
+    destination: (request, file, cb) => {
+      cb(null, "public/");
+    },
+    filename: (request, file, cb) => {
+      let uuid = uuidv4().toString();
+      var temp_file_arr = file.originalname.split(".");
+      var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
+      cb(null, uuid + "." + temp_file_extension);
+    },
+  });
+}
 var upload = multer({ storage: storage });
 
 app.use(sanitizer.middleware);
