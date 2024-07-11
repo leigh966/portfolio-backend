@@ -27,7 +27,8 @@ export async function image_exists(image_filename, res) {
   }
   // else
   // check the filesystem for it
-  if (fs.existsSync(__dirname + "public/" + image_filename)) {
+  console.log(__dirname);
+  if (fs.existsSync(__dirname + "/public/" + image_filename)) {
     return true;
   }
   return false;
