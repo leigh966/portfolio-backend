@@ -6,6 +6,7 @@ import {
 } from "./aws-operations.js";
 import verify from "./verify.js";
 import { removeDangerousCharacters } from "./validation.js";
+import { image_exists } from "./images.js";
 
 export function addProject(req, res) {
   const pgClient = getClient();
@@ -18,36 +19,36 @@ export function addProject(req, res) {
 
   // if an image_filename is given
   if (req.body["image_filename"] != null && req.body["image_filename"] != "") {
-    console.log("trying to fetch image from aws");
-    let command = new GetObjectCommand({
-      Bucket: process.env.S3_BUCKET,
-      Key: req.body["image_filename"],
-    });
-    aws_client
-      .send(command)
-      .then(() => {
-        const text =
-          "INSERT INTO projects(name, description, tagline, image_filename) VALUES($1, $2, $3, $4) RETURNING *";
-        const values = [
-          removeDangerousCharacters(json.name),
-          removeDangerousCharacters(json.description),
-          removeDangerousCharacters(json.tagline),
-          removeDangerousCharacters(req.body["image_filename"]),
-        ];
+    image_exists(removeDangerousCharacters(req.body["image_filename"]), res)
+      .then((exists) => {
+        if (exists) {
+          const text =
+            "INSERT INTO projects(name, description, tagline, image_filename) VALUES($1, $2, $3, $4) RETURNING *";
+          const values = [
+            removeDangerousCharacters(json.name),
+            removeDangerousCharacters(json.description),
+            removeDangerousCharacters(json.tagline),
+            removeDangerousCharacters(req.body["image_filename"]),
+          ];
 
-        pgClient.query(text, values).then((dbRes) => {
-          if (dbRes.rows.length > 0) {
-            res.status(201);
-            res.send(dbRes.rows[0]);
-            return;
-          }
-          res.status(500);
-          res.send("Error writing to db");
-        });
+          pgClient.query(text, values).then((dbRes) => {
+            if (dbRes.rows.length > 0) {
+              res.status(201);
+              res.send(dbRes.rows[0]);
+              return;
+            }
+            res.status(500);
+            res.send("Error writing to db");
+          });
+        } else {
+          res.status(404);
+          res.send("The referenced image does not exist");
+        }
       })
       .catch((err) => {
         handleGetObjectError(err, res);
       });
+
     return;
   }
 
@@ -69,7 +70,6 @@ export function addProject(req, res) {
     res.send("Error writing to db");
   });
 }
-
 export function deleteProject(req, res) {
   const pgClient = getClient();
   if (!verify.sessionId(req.headers.session_id)) {

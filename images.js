@@ -9,6 +9,26 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import path from "path";
 import verify from "./verify.js";
 
+export async function image_exists(image_filename, res) {
+  // if using aws
+  if (process.env.S3_BUCKET) {
+    // try to fetch the image
+    console.log("trying to fetch image from aws");
+    let command = new GetObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: image_filename,
+    });
+    await aws_client.send(command);
+    return true;
+  }
+  // else
+  // check the filesystem for it
+  if (fs.existsSync("public/" + image_filename)) {
+    return true;
+  }
+  return false;
+}
+
 export function upload_image(request, response) {
   if (!verify.sessionId(request.headers.session_id)) {
     response.status(401);
