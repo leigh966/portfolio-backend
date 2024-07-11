@@ -12,7 +12,11 @@
     "speakeasy": "^2.0.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "jest": "echo \"Error: no test specified\" && exit 1"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
 }
