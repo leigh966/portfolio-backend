@@ -23,7 +23,7 @@ export async function image_exists(image_filename, res) {
   }
   // else
   // check the filesystem for it
-  if (fs.existsSync("public/" + image_filename)) {
+  if (fs.existsSync("./public/" + image_filename)) {
     return true;
   }
   return false;
