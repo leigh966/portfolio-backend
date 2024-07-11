@@ -8,7 +8,11 @@ import {
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import path from "path";
 import verify from "./verify.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 export async function image_exists(image_filename, res) {
   // if using aws
   if (process.env.S3_BUCKET) {
