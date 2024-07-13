@@ -33,7 +33,7 @@ export async function image_exists(image_filename, res) {
   }
   return false;
 }
-
+import { restoreDangerousCharacters } from "./validation.js";
 export function upload_image(request, response) {
   if (!verify.sessionId(request.headers.session_id)) {
     response.status(401);
@@ -47,14 +47,17 @@ export function upload_image(request, response) {
     var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
     var filename = uuid + "." + temp_file_extension;
     // if using aws
-    uploadFileToAWS(request.file.buffer, filename).then((awsRes) => {
+    uploadFileToAWS(
+      request.file.buffer,
+      removeDangerousCharacters(filename)
+    ).then((awsRes) => {
       // should probably clean up the temp file here
       response.status(201);
       response.send(filename);
     });
   } else {
     response.status(201);
-    response.send(request.file.filename);
+    response.send(restoreDangerousCharacters(request.file.filename));
   }
 }
 
@@ -93,6 +96,7 @@ export function get_image(req, res) {
 }
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { removeDangerousCharacters } from "./validation.js";
 export async function generateSignedUrl(req, res) {
   let command = await new GetObjectCommand({
     Bucket: process.env.S3_BUCKET,

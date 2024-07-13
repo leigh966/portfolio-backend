@@ -13,7 +13,7 @@ export function restoreDangerousCharacters(s) {
 
 const lowerCase = "qwertyuiopasdfghjklzxcvbnmm";
 const upperCase = lowerCase.toUpperCase();
-const allowedCharacters = lowerCase + upperCase + "1234567890";
+const allowedCharacters = lowerCase + upperCase + "1234567890.";
 export function removeDangerousCharacters(s) {
   let output = "";
   for (let i = 0; i < s.length; i++) {
