@@ -25,7 +25,7 @@ if (process.env.S3_BUCKET) {
       let uuid = uuidv4().toString();
       var temp_file_arr = file.originalname.split(".");
       var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
-      cb(null, removeDangerousCharacters(uuid + "." + temp_file_extension));
+      cb(null, uuid + "." + temp_file_extension);
     },
   });
 }

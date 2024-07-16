@@ -47,17 +47,14 @@ export function upload_image(request, response) {
     var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
     var filename = uuid + "." + temp_file_extension;
     // if using aws
-    uploadFileToAWS(
-      request.file.buffer,
-      removeDangerousCharacters(filename)
-    ).then((awsRes) => {
+    uploadFileToAWS(request.file.buffer, filename).then((awsRes) => {
       // should probably clean up the temp file here
       response.status(201);
       response.send(filename);
     });
   } else {
     response.status(201);
-    response.send(restoreDangerousCharacters(request.file.filename));
+    response.send(request.file.filename);
   }
 }
 

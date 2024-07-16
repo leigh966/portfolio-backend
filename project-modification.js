@@ -19,7 +19,7 @@ export function addProject(req, res) {
 
   // if an image_filename is given
   if (req.body["image_filename"] != null && req.body["image_filename"] != "") {
-    image_exists(removeDangerousCharacters(req.body["image_filename"]), res)
+    image_exists(req.body["image_filename"], res)
       .then((exists) => {
         if (exists) {
           const text =
