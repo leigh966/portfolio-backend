@@ -97,7 +97,13 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/image/:filename", get_image);
-app.get("/signed_url/:filename", generateSignedUrl); // will replace above
+app.get("/image_url/:filename", (req, res) => {
+  if (process.env.S3_BUCKET) {
+    return generateSignedUrl(req, res);
+  }
+  res.send(process.env.IP + ":" + process.env.PORT + "/" + req.params.filename);
+  res.status(200);
+});
 
 //require("./setup_table").setup(getClient()); // setup table
 import setup_table from "./setup_table.js";
