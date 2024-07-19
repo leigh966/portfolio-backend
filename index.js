@@ -103,7 +103,9 @@ app.get("/image_url/:filename", (req, res) => {
   if (process.env.S3_BUCKET) {
     return generateSignedUrl(req, res);
   }
-  res.send(process.env.IP + ":" + process.env.PORT + "/" + req.params.filename);
+  res.send(
+    process.env.BACKEND_URL + ":" + process.env.PORT + "/" + req.params.filename
+  );
   res.status(200);
 });
 
