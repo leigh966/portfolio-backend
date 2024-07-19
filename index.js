@@ -6,6 +6,8 @@ import { upload_image, get_image, generateSignedUrl } from "./images.js";
 import multer from "multer";
 import { getAllProjects } from "./project-fetching.js";
 import { addProject, deleteProject } from "./project-modification.js";
+import fs from "fs";
+import https from "https";
 app.use(express.json());
 app.use(express.static("public"));
 
@@ -110,6 +112,15 @@ import setup_table from "./setup_table.js";
 import { removeDangerousCharacters } from "./validation.js";
 setup_table(getClient());
 // Server setup
-app.listen(process.env.PORT, () => {
-  console.log("Server is Running");
+if (process.env.ENABLE_HTTPS == "true") {
+  var privateKey = fs.readFileSync(process.env.HTTPS_KEY, "utf8");
+  var certificate = fs.readFileSync(process.env.HTTPS_CERT, "utf8");
+  var credentials = { key: privateKey, cert: certificate };
+  https.createServer(credentials, app).listen(process.env.PORT, () => {
+    console.log("Server is Running with HTTPS");
 });
+} else {
+  app.listen(process.env.PORT, () => {
+    console.log("Server is Running");
+  });
+}
