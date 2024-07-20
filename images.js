@@ -34,28 +34,17 @@ export async function image_exists(image_filename, res) {
   return false;
 }
 import { restoreDangerousCharacters } from "./validation.js";
-export function upload_image(request, response) {
-  if (!verify.sessionId(request.headers.session_id)) {
-    response.status(401);
-    response.send("Authentication Failed");
-    return;
-  }
+export function upload_image(request, response, image_handler) {
+  // if (!verify.sessionId(request.headers.session_id)) {
+  //   response.status(401);
+  //   response.send("Authentication Failed");
+  //   return;
+  // }
 
-  if (process.env.S3_BUCKET != null && process.env.S3_BUCKET != undefined) {
-    let uuid = uuidv4().toString();
-    var temp_file_arr = request.file.originalname.split(".");
-    var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
-    var filename = uuid + "." + temp_file_extension;
-    // if using aws
-    uploadFileToAWS(request.file.buffer, filename).then((awsRes) => {
-      // should probably clean up the temp file here
-      response.status(201);
-      response.send(filename);
-    });
-  } else {
+  image_handler.save(request.file).then((filename) => {
     response.status(201);
-    response.send(request.file.filename);
-  }
+    response.send(filename);
+  });
 }
 
 export function get_image(req, res) {
@@ -90,19 +79,4 @@ export function get_image(req, res) {
     .catch((err) => {
       handleGetObjectError(err, res);
     });
-}
-
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { removeDangerousCharacters } from "./validation.js";
-export async function generateSignedUrl(req, res) {
-  let command = await new GetObjectCommand({
-    Bucket: process.env.S3_BUCKET,
-    Key: req.paramString("filename"),
-    Expires: 60,
-  });
-
-  const url = await getSignedUrl(aws_client, command);
-
-  res.status(200);
-  res.send(url);
 }

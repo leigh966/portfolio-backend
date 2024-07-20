@@ -2,7 +2,7 @@
 import express from "express";
 const app = express();
 import { getClient } from "./postgres_client.js";
-import { upload_image, get_image, generateSignedUrl } from "./images.js";
+import { upload_image, get_image } from "./images.js";
 import multer from "multer";
 import { getAllProjects } from "./project-fetching.js";
 import { addProject, deleteProject } from "./project-modification.js";
@@ -15,10 +15,17 @@ import { config } from "dotenv";
 config();
 import sanitizer from "sanitize";
 import { v4 as uuidv4 } from "uuid";
+
+import { AwsImageHandler } from "./AwsImageHandler.js";
+import { FsImageHandler } from "./FsImageHandler.js";
+
 var storage;
+var image_handler;
 if (process.env.S3_BUCKET) {
   storage = multer.memoryStorage();
+  image_handler = new AwsImageHandler(client);
 } else {
+  image_handler = new FsImageHandler();
   storage = multer.diskStorage({
     destination: (request, file, cb) => {
       cb(null, "public/");
@@ -43,7 +50,9 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.post("/image", upload.single("image"), upload_image);
+app.post("/image", upload.single("image"), (req, res) =>
+  upload_image(req, res, image_handler)
+);
 
 app.delete("/project/:id", deleteProject);
 
@@ -100,18 +109,16 @@ app.post("/login", (req, res) => {
 
 app.get("/image/:filename", get_image);
 app.get("/image_url/:filename", (req, res) => {
-  if (process.env.S3_BUCKET) {
-    return generateSignedUrl(req, res);
-  }
-  res.send(
-    process.env.BACKEND_URL + ":" + process.env.PORT + "/" + req.params.filename
-  );
-  res.status(200);
+  image_handler.get_url(req.params.filename).then((url) => {
+    res.send(url);
+    res.status(200);
+  });
 });
 
 //require("./setup_table").setup(getClient()); // setup table
 import setup_table from "./setup_table.js";
 import { removeDangerousCharacters } from "./validation.js";
+import { client } from "./aws-operations.js";
 setup_table(getClient());
 // Server setup
 if (process.env.ENABLE_HTTPS == "true") {
@@ -120,7 +127,7 @@ if (process.env.ENABLE_HTTPS == "true") {
   var credentials = { key: privateKey, cert: certificate };
   https.createServer(credentials, app).listen(process.env.PORT, () => {
     console.log("Server is Running with HTTPS");
-});
+  });
 } else {
   app.listen(process.env.PORT, () => {
     console.log("Server is Running");
