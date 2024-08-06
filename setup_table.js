@@ -1,5 +1,5 @@
 export default async function setup(client) {
-  let createTableQuery = `
+  let createProjectsTableQuery = `
     CREATE TABLE IF NOT EXISTS projects(
       id BIGSERIAL PRIMARY KEY NOT NULL ,
       name varchar,
@@ -8,8 +8,25 @@ export default async function setup(client) {
       last_updated TIMESTAMP NOT NULL DEFAULT current_timestamp,
       image_filename varchar
     );
+    `;
+  let createEducationAndWorkTableQuery = `
+    CREATE TABLE IF NOT EXISTS education(
+      id BIGSERIAL PRIMARY KEY NOT NULL ,
+      school VARCHAR NOT NULL,
+      course VARCHAR NOT NULL,
+      start_date DATE,
+      end_date DATE
+    );
+    CREATE TABLE IF NOT EXISTS employment(
+      id BIGSERIAL PRIMARY KEY NOT NULL ,
+      employer VARCHAR NOT NULL,
+      job_title VARCHAR NOT NULL,
+      start_date DATE,
+      end_date DATE
+    );
   `;
-  const res = await client.query(createTableQuery);
-  console.log(`Created table.`);
+  await client.query(createProjectsTableQuery);
+  await client.query(createEducationAndWorkTableQuery);
+  console.log(`Created tables.`);
   await client.end();
 }

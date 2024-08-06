@@ -114,11 +114,9 @@ app.get("/image_url/:filename", (req, res) => {
     res.status(200);
   });
 });
-
-//require("./setup_table").setup(getClient()); // setup table
 import setup_table from "./setup_table.js";
 import { removeDangerousCharacters } from "./validation.js";
-import { client } from "./aws-operations.js";
+
 setup_table(getClient());
 // Server setup
 if (process.env.ENABLE_HTTPS == "true") {
