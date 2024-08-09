@@ -16,7 +16,7 @@ config();
 import sanitizer from "sanitize";
 import { v4 as uuidv4 } from "uuid";
 
-import { AwsImageHandler } from "./AwsImageHandler.js";
+import { AwsImageHandler } from "./ImageHandlers/AwsImageHandler.js";
 import { FsImageHandler } from "./FsImageHandler.js";
 
 var storage;
