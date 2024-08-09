@@ -57,6 +57,7 @@ app.post("/image", upload.single("image"), (req, res) =>
 app.delete("/project/:id", deleteProject);
 
 app.get("/education", (req, res) => standardGetAll(res, Education));
+app.get("/employment", (req, res) => standardGetAll(res, Employment));
 
 app.put("/project/:id", (req, res) => {
   const pgClient = getClient();
@@ -121,6 +122,7 @@ import { removeDangerousCharacters } from "./validation.js";
 import { standardGetAll } from "./standardised-endpoints.js";
 setup_table(getClient());
 import { Education } from "./Education.js";
+import { Employment } from "./Employment.js";
 
 // Server setup
 if (process.env.ENABLE_HTTPS == "true") {
