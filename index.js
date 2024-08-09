@@ -4,12 +4,12 @@ const app = express();
 import { getClient } from "./postgres_client.js";
 import { upload_image, get_image } from "./images.js";
 import multer from "multer";
-import { getAllProjects } from "./project-fetching.js";
 import { addProject, deleteProject } from "./project-modification.js";
 import fs from "fs";
 import https from "https";
 app.use(express.json());
 app.use(express.static("public"));
+import { Project } from "./Project.js";
 
 import { config } from "dotenv";
 config();
@@ -56,6 +56,8 @@ app.post("/image", upload.single("image"), (req, res) =>
 
 app.delete("/project/:id", deleteProject);
 
+app.get("/education", (req, res) => standardGetAll(res, Education));
+
 app.put("/project/:id", (req, res) => {
   const pgClient = getClient();
   if (!verify.sessionId(req.headers.session_id)) {
@@ -83,7 +85,7 @@ app.put("/project/:id", (req, res) => {
   });
 });
 
-app.get("/projects", getAllProjects);
+app.get("/projects", (req, res) => standardGetAll(res, Project));
 
 app.post("/project", addProject);
 
@@ -116,8 +118,10 @@ app.get("/image_url/:filename", (req, res) => {
 });
 import setup_table from "./setup_table.js";
 import { removeDangerousCharacters } from "./validation.js";
-
+import { standardGetAll } from "./standardised-endpoints.js";
 setup_table(getClient());
+import { Education } from "./Education.js";
+
 // Server setup
 if (process.env.ENABLE_HTTPS == "true") {
   var privateKey = fs.readFileSync(process.env.HTTPS_KEY, "utf8");

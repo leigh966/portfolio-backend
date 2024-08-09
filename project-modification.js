@@ -17,7 +17,7 @@ export function addProject(req, res) {
     res.send("Authentication Failed");
     return;
   }
-  const project = new Project(json, pgClient);
+  const project = new Project(pgClient, json);
   // if an image_filename is given
   if (req.body["image_filename"] != null && req.body["image_filename"] != "") {
     image_exists(req.body["image_filename"], res)
