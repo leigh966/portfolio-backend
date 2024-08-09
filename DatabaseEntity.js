@@ -1,4 +1,8 @@
-import { restoreDangerousCharacters } from "./validation.js";
+import { client } from "./aws-operations.js";
+import {
+  removeDangerousCharacters,
+  restoreDangerousCharacters,
+} from "./validation.js";
 
 export class DatabaseEntity {
   constructor(tableName, dbClient) {
@@ -21,5 +25,19 @@ export class DatabaseEntity {
       output.push(outputRow);
     }
     return output;
+  }
+  async insert(columns, values) {
+    const colText = columns.join(",");
+    const text = `INSERT INTO ${this.tableName}(${colText}) VALUES($1, $2, $3, $4) RETURNING *`;
+    const dbRes = await this.dbClient.query(
+      text,
+      values.map((val) => removeDangerousCharacters(val))
+    );
+    return dbRes.rows.length > 0;
+  }
+
+  // do not use in super class
+  async insertThis() {
+    return this.insert(this.columns, this.values);
   }
 }
