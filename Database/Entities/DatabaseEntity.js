@@ -1,8 +1,8 @@
-import { client } from "./aws-operations.js";
+import { client } from "../../aws-operations.js";
 import {
   removeDangerousCharacters,
   restoreDangerousCharacters,
-} from "./validation.js";
+} from "../../validation.js";
 
 export class DatabaseEntity {
   constructor(tableName, dbClient) {

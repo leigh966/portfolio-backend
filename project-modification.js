@@ -7,7 +7,7 @@ import {
 import verify from "./verify.js";
 import { removeDangerousCharacters } from "./validation.js";
 import { image_exists } from "./images.js";
-import { Project } from "./Project.js";
+import { Project } from "./Database/Entities/Project.js";
 
 export function addProject(req, res) {
   const pgClient = getClient();

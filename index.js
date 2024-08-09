@@ -9,7 +9,7 @@ import fs from "fs";
 import https from "https";
 app.use(express.json());
 app.use(express.static("public"));
-import { Project } from "./Project.js";
+import { Project } from "./Database/Entities/Project.js";
 
 import { config } from "dotenv";
 config();
@@ -121,8 +121,8 @@ import setup_table from "./setup_table.js";
 import { removeDangerousCharacters } from "./validation.js";
 import { standardGetAll } from "./standardised-endpoints.js";
 setup_table(getClient());
-import { Education } from "./Education.js";
-import { Employment } from "./Employment.js";
+import { Education } from "./Database/Entities/Education.js";
+import { Employment } from "./Database/Entities/Employment.js";
 
 // Server setup
 if (process.env.ENABLE_HTTPS == "true") {
