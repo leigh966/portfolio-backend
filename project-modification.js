@@ -7,6 +7,7 @@ import {
 import verify from "./verify.js";
 import { removeDangerousCharacters } from "./validation.js";
 import { image_exists } from "./images.js";
+import { Project } from "./Project.js";
 
 export function addProject(req, res) {
   const pgClient = getClient();
@@ -16,25 +17,16 @@ export function addProject(req, res) {
     res.send("Authentication Failed");
     return;
   }
-
+  const project = new Project(json, pgClient);
   // if an image_filename is given
   if (req.body["image_filename"] != null && req.body["image_filename"] != "") {
     image_exists(req.body["image_filename"], res)
       .then((exists) => {
         if (exists) {
-          const text =
-            "INSERT INTO projects(name, description, tagline, image_filename) VALUES($1, $2, $3, $4) RETURNING *";
-          const values = [
-            removeDangerousCharacters(json.name),
-            removeDangerousCharacters(json.description),
-            removeDangerousCharacters(json.tagline),
-            removeDangerousCharacters(req.body["image_filename"]),
-          ];
-
-          pgClient.query(text, values).then((dbRes) => {
-            if (dbRes.rows.length > 0) {
+          project.insertThis().then((success) => {
+            if (success) {
               res.status(201);
-              res.send(dbRes.rows[0]);
+              res.send("Record added");
               return;
             }
             res.status(500);
@@ -51,19 +43,10 @@ export function addProject(req, res) {
 
     return;
   }
-
-  const text =
-    "INSERT INTO projects(name, description, tagline) VALUES($1, $2, $3) RETURNING *";
-  const values = [
-    removeDangerousCharacters(json.name),
-    removeDangerousCharacters(json.description),
-    removeDangerousCharacters(json.tagline),
-  ];
-
-  pgClient.query(text, values).then((dbRes) => {
-    if (dbRes.rows.length > 0) {
+  project.insertThis().then((success) => {
+    if (success) {
       res.status(201);
-      res.send(dbRes.rows[0]);
+      res.send("Record added");
       return;
     }
     res.status(500);
