@@ -5,9 +5,11 @@ import {
 } from "../../validation.js";
 
 export class DatabaseEntity {
-  constructor(tableName, dbClient) {
+  constructor(tableName, dbClient, values) {
     this.tableName = tableName;
     this.dbClient = dbClient;
+    if (!values) return;
+    this.values = values.map((val) => removeDangerousCharacters(val));
   }
   async getAll() {
     let dbResponse = await this.dbClient.query(
@@ -29,10 +31,7 @@ export class DatabaseEntity {
   async insert(columns, values) {
     const colText = columns.join(",");
     const text = `INSERT INTO ${this.tableName}(${colText}) VALUES($1, $2, $3, $4) RETURNING *`;
-    const dbRes = await this.dbClient.query(
-      text,
-      values.map((val) => removeDangerousCharacters(val))
-    );
+    const dbRes = await this.dbClient.query(text, values);
     return dbRes.rows.length > 0;
   }
 

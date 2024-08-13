@@ -94,6 +94,12 @@ app.get("/projects", (req, res) => standardGetAll(res, Project));
 app.post("/project", (req, res) =>
   verifyEndpoint(req, res, () => standardInsert(req.body, res, Project))
 );
+app.post("/employment", (req, res) =>
+  verifyEndpoint(req, res, () => standardInsert(req.body, res, Employment))
+);
+app.post("/education", (req, res) =>
+  verifyEndpoint(req, res, () => standardInsert(req.body, res, Education))
+);
 
 import verify, { verifyEndpoint } from "./verify.js";
 

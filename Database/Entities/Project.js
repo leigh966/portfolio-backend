@@ -5,14 +5,11 @@ import FileNotFoundError from "../../FileNotFoundError.js";
 export class Project extends DatabaseEntity {
   columns = ["name", "description", "tagline", "image_filename"];
   constructor(client, json) {
-    super("projects", client);
-    if (!json) return;
-    this.values = [
-      json.name,
-      json.description,
-      json.tagline,
-      json.image_filename,
-    ];
+    let values = null;
+    if (json) {
+      values = [json.name, json.description, json.tagline, json.image_filename];
+    }
+    super("projects", client, values);
   }
   async insertThis() {
     const image_filename = this.values[3];
