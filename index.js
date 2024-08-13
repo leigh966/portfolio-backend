@@ -61,34 +61,6 @@ app.delete("/project/:id", (req, res) =>
 
 app.get("/education", (req, res) => standardGetAll(res, Education));
 app.get("/employment", (req, res) => standardGetAll(res, Employment));
-
-app.put("/project/:id", (req, res) => {
-  const pgClient = getClient();
-  if (!verify.sessionId(req.headers.session_id)) {
-    res.status(401);
-    res.send("Authentication Failed");
-    return;
-  }
-  const name = removeDangerousCharacters(req.bodyString("name"));
-  const description = removeDangerousCharacters(req.bodyString("description"));
-  const tagline = removeDangerousCharacters(req.bodyString("tagline"));
-  const image_filename = removeDangerousCharacters(
-    req.bodyString("image_filename")
-  );
-  const query = `UPDATE projects SET name='${name}', tagline='${tagline}', description='${description}', last_updated=now(), image_filename='${image_filename}' WHERE id=${req.paramInt(
-    "id"
-  )} RETURNING *`;
-  pgClient.query(query).then((dbRes) => {
-    if (dbRes.rows.length > 0) {
-      res.status(200);
-      res.send(dbRes.rows[0]);
-      return;
-    }
-    res.status(500);
-    res.send("Error writing to db - is your id correct?");
-  });
-});
-
 app.get("/projects", (req, res) => standardGetAll(res, Project));
 
 app.post("/project", (req, res) =>
@@ -99,6 +71,12 @@ app.post("/employment", (req, res) =>
 );
 app.post("/education", (req, res) =>
   verifyEndpoint(req, res, () => standardInsert(req.body, res, Education))
+);
+
+app.put("/project/:id", (req, res) =>
+  verifyEndpoint(req, res, () =>
+    standardUpdate(req.paramInt("id"), req.body, res, Project)
+  )
 );
 
 import verify, { verifyEndpoint } from "./verify.js";
@@ -128,11 +106,11 @@ app.get("/image_url/:filename", (req, res) => {
   });
 });
 import setup_table from "./setup_table.js";
-import { removeDangerousCharacters } from "./validation.js";
 import {
   standardDelete,
   standardGetAll,
   standardInsert,
+  standardUpdate,
 } from "./standardised-endpoints.js";
 setup_table(getClient());
 import { Education } from "./Database/Entities/Education.js";

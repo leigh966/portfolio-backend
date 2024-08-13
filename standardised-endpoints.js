@@ -18,14 +18,12 @@ export function standardDelete(id, res, dbEntity) {
   });
 }
 
-export function standardInsert(json, res, dbEntity) {
-  const entityObj = new dbEntity(getClient(), json);
-  entityObj
-    .insertThis()
+function attemptAlteringMethod(method, res, successMessage) {
+  method()
     .then((success) => {
       if (success) {
         res.status(201);
-        res.send("Record added");
+        res.send(successMessage);
         return;
       }
       res.status(500);
@@ -41,4 +39,14 @@ export function standardInsert(json, res, dbEntity) {
         console.log(err);
       }
     });
+}
+
+export function standardInsert(json, res, dbEntity) {
+  const entityObj = new dbEntity(getClient(), json);
+  attemptAlteringMethod(() => entityObj.insertThis(), res, "Record Added");
+}
+
+export function standardUpdate(id, json, res, dbEntity) {
+  const entityObj = new dbEntity(getClient(), json, id);
+  attemptAlteringMethod(() => entityObj.updateThis(), res, "Record Updated");
 }

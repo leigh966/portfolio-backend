@@ -5,11 +5,12 @@ import {
 } from "../../validation.js";
 
 export class DatabaseEntity {
-  constructor(tableName, dbClient, values) {
+  constructor(tableName, dbClient, values, id) {
     this.tableName = tableName;
     this.dbClient = dbClient;
     if (!values) return;
     this.values = values.map((val) => removeDangerousCharacters(val));
+    this.id = id;
   }
   async getAll() {
     let dbResponse = await this.dbClient.query(
@@ -43,5 +44,21 @@ export class DatabaseEntity {
   async deleteById(id) {
     const query = `DELETE FROM projects WHERE id=${id}`;
     await client.query(query);
+  }
+
+  async updateById(id, columns, values) {
+    let query = `UPDATE ${this.tableName} SET `;
+    columns.forEach((element, index) => {
+      if (index > 0) query += ", ";
+      query += element + "=$" + (index + 1);
+    });
+    query += ` WHERE id=${id} RETURNING *;`;
+    console.log(query);
+    const dbRes = await this.dbClient.query(query, values);
+    return dbRes.rows.length > 0;
+  }
+
+  async updateThis() {
+    return await this.updateById(this.id, this.columns, this.values);
   }
 }

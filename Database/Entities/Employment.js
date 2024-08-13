@@ -3,12 +3,12 @@ import { DatabaseEntity } from "./DatabaseEntity.js";
 
 export class Employment extends DatabaseEntity {
   columns = ["employer", "job_title", "start_date", "end_date"];
-  constructor(client, json) {
+  constructor(client, json, id) {
     let values = null;
     if (json) {
       values = [json.employer, json.job_title, json.start_date, json.end_date];
     }
-    super("employment", client, values);
+    super("employment", client, values, id);
     if (!values) return;
     this.values[2] = restoreDangerousCharacters(this.values[2]);
     this.values[3] = restoreDangerousCharacters(this.values[3]);

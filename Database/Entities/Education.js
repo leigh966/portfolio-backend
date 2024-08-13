@@ -3,12 +3,12 @@ import { DatabaseEntity } from "./DatabaseEntity.js";
 
 export class Education extends DatabaseEntity {
   columns = ["school", "course", "start_date", "end_date"];
-  constructor(client, json) {
+  constructor(client, json, id) {
     let values = null;
     if (json) {
       values = [json.school, json.course, json.start_date, json.end_date];
     }
-    super("education", client, values);
+    super("education", client, values, id);
     if (!values) return;
     this.values[2] = restoreDangerousCharacters(this.values[2]);
     this.values[3] = restoreDangerousCharacters(this.values[3]);
