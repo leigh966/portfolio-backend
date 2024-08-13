@@ -40,4 +40,9 @@ export class DatabaseEntity {
   async insertThis() {
     return this.insert(this.columns, this.values);
   }
+
+  async deleteById(id) {
+    const query = `DELETE FROM projects WHERE id=${id}`;
+    await client.query(query);
+  }
 }
