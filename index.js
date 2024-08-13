@@ -4,7 +4,7 @@ const app = express();
 import { getClient } from "./postgres_client.js";
 import { upload_image, get_image } from "./images.js";
 import multer from "multer";
-import { addProject, deleteProject } from "./project-modification.js";
+import { addProject } from "./project-modification.js";
 import fs from "fs";
 import https from "https";
 app.use(express.json());
@@ -54,7 +54,11 @@ app.post("/image", upload.single("image"), (req, res) =>
   upload_image(req, res, image_handler)
 );
 
-app.delete("/project/:id", deleteProject);
+app.delete("/project/:id", (req, res) =>
+  verifyEndpoint(req, res, () =>
+    standardDelete(req.paramInt("id"), res, getClient())
+  )
+);
 
 app.get("/education", (req, res) => standardGetAll(res, Education));
 app.get("/employment", (req, res) => standardGetAll(res, Employment));
@@ -90,7 +94,7 @@ app.get("/projects", (req, res) => standardGetAll(res, Project));
 
 app.post("/project", addProject);
 
-import verify from "./verify.js";
+import verify, { verifyEndpoint } from "./verify.js";
 import Console from "console";
 
 app.post("/login", (req, res) => {
@@ -119,7 +123,7 @@ app.get("/image_url/:filename", (req, res) => {
 });
 import setup_table from "./setup_table.js";
 import { removeDangerousCharacters } from "./validation.js";
-import { standardGetAll } from "./standardised-endpoints.js";
+import { standardDelete, standardGetAll } from "./standardised-endpoints.js";
 setup_table(getClient());
 import { Education } from "./Database/Entities/Education.js";
 import { Employment } from "./Database/Entities/Employment.js";

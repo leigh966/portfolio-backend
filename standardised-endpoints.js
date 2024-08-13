@@ -7,3 +7,11 @@ export function standardGetAll(res, dbEntity) {
     return;
   });
 }
+
+export function standardDelete(id, res, dbEntity) {
+  const entityObj = new dbEntity(client);
+  entityObj.deleteById(id).then(() => {
+    res.status(204);
+    res.send("Done");
+  });
+}
