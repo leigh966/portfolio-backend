@@ -92,10 +92,11 @@ app.put("/project/:id", (req, res) => {
 
 app.get("/projects", (req, res) => standardGetAll(res, Project));
 
-app.post("/project", addProject);
+app.post("/project", (req, res) =>
+  verifyEndpoint(req, res, () => addProject(req, res))
+);
 
 import verify, { verifyEndpoint } from "./verify.js";
-import Console from "console";
 
 app.post("/login", (req, res) => {
   const json = req.body;

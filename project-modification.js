@@ -1,22 +1,15 @@
 import { getClient } from "./postgres_client.js";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
 import {
   client as aws_client,
   handleGetObjectError,
 } from "./aws-operations.js";
 import verify from "./verify.js";
-import { removeDangerousCharacters } from "./validation.js";
 import { image_exists } from "./images.js";
 import { Project } from "./Database/Entities/Project.js";
 
 export function addProject(req, res) {
   const pgClient = getClient();
   const json = req.body;
-  if (!verify.sessionId(req.headers.session_id)) {
-    res.status(401);
-    res.send("Authentication Failed");
-    return;
-  }
   const project = new Project(pgClient, json);
   // if an image_filename is given
   if (req.body["image_filename"] != null && req.body["image_filename"] != "") {
