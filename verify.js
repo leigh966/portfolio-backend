@@ -49,3 +49,12 @@ const verify = {
   otp: verifyOTP,
 };
 export default verify;
+
+export function verifyEndpoint(req, res, endpoint) {
+  if (!verify.sessionId(req.headers.session_id)) {
+    res.status(401);
+    res.send("Authentication Failed");
+    return;
+  }
+  endpoint();
+}
