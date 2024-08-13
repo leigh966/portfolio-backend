@@ -4,7 +4,6 @@ const app = express();
 import { getClient } from "./postgres_client.js";
 import { upload_image, get_image } from "./images.js";
 import multer from "multer";
-import { addProject } from "./project-modification.js";
 import fs from "fs";
 import https from "https";
 app.use(express.json());
@@ -93,7 +92,7 @@ app.put("/project/:id", (req, res) => {
 app.get("/projects", (req, res) => standardGetAll(res, Project));
 
 app.post("/project", (req, res) =>
-  verifyEndpoint(req, res, () => addProject(req, res))
+  verifyEndpoint(req, res, () => standardInsert(req.body, res, Project))
 );
 
 import verify, { verifyEndpoint } from "./verify.js";
@@ -124,7 +123,11 @@ app.get("/image_url/:filename", (req, res) => {
 });
 import setup_table from "./setup_table.js";
 import { removeDangerousCharacters } from "./validation.js";
-import { standardDelete, standardGetAll } from "./standardised-endpoints.js";
+import {
+  standardDelete,
+  standardGetAll,
+  standardInsert,
+} from "./standardised-endpoints.js";
 setup_table(getClient());
 import { Education } from "./Database/Entities/Education.js";
 import { Employment } from "./Database/Entities/Employment.js";

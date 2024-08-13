@@ -13,7 +13,7 @@ import { dirname } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-export async function image_exists(image_filename, res) {
+export async function image_exists(image_filename) {
   // if using aws
   if (process.env.S3_BUCKET) {
     // try to fetch the image
