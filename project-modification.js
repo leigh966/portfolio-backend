@@ -11,20 +11,23 @@ export function addProject(req, res) {
   const pgClient = getClient();
   const json = req.body;
   const project = new Project(pgClient, json);
+  function insertProject() {
+    project.insertThis().then((success) => {
+      if (success) {
+        res.status(201);
+        res.send("Record added");
+        return;
+      }
+      res.status(500);
+      res.send("Error writing to db");
+    });
+  }
   // if an image_filename is given
   if (req.body["image_filename"] != null && req.body["image_filename"] != "") {
     image_exists(req.body["image_filename"], res)
       .then((exists) => {
         if (exists) {
-          project.insertThis().then((success) => {
-            if (success) {
-              res.status(201);
-              res.send("Record added");
-              return;
-            }
-            res.status(500);
-            res.send("Error writing to db");
-          });
+          insertProject();
         } else {
           res.status(404);
           res.send("The referenced image does not exist");
@@ -36,13 +39,5 @@ export function addProject(req, res) {
 
     return;
   }
-  project.insertThis().then((success) => {
-    if (success) {
-      res.status(201);
-      res.send("Record added");
-      return;
-    }
-    res.status(500);
-    res.send("Error writing to db");
-  });
+  insertProject();
 }
