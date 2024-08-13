@@ -37,7 +37,7 @@ export function standardInsert(json, res, dbEntity) {
         res.send("Image not found");
       } else {
         res.status(500);
-        res.send("Unknown error checking existance of image");
+        res.send("Unknown error");
         console.log(err);
       }
     });
