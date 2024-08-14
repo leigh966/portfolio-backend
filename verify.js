@@ -3,7 +3,11 @@ import speakeasy from "speakeasy";
 dotenv.config();
 
 const key = process.env.SECRET_KEY;
-var sessionId = null;
+const SESSION_LIVE_TIME = 3600000; //ms = 1h
+var session = {
+  id: null,
+  time: null,
+};
 
 // Including crypto module
 import crypto from "crypto";
@@ -26,7 +30,14 @@ export function verifyPassword(password, storedSalt, storedHash) {
 }
 
 export function verifySessionId(givenSessionId) {
-  return givenSessionId == sessionId && sessionId != null;
+  const good =
+    givenSessionId == session.id &&
+    session.id != null &&
+    Number(session.time) + Number(SESSION_LIVE_TIME) > Number(Date.now());
+  if (good) {
+    session.time = Date.now(); // extend the time on successful verification of this session
+  }
+  return good;
 }
 
 export function generateSessionId(res) {
@@ -38,8 +49,9 @@ export function generateSessionId(res) {
       return;
     }
 
-    sessionId = buf.toString("hex");
-    res.send(sessionId);
+    session.id = buf.toString("hex");
+    session.time = Date.now();
+    res.send(session.id);
   });
 }
 const verify = {
