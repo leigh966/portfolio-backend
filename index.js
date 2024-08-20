@@ -78,6 +78,16 @@ app.put("/project/:id", (req, res) =>
     standardUpdate(req.paramInt("id"), req.body, res, Project)
   )
 );
+app.put("/employment/:id", (req, res) =>
+  verifyEndpoint(req, res, () =>
+    standardUpdate(req.paramInt("id"), req.body, res, Employment)
+  )
+);
+app.put("/education/:id", (req, res) =>
+  verifyEndpoint(req, res, () =>
+    standardUpdate(req.paramInt("id"), req.body, res, Education)
+  )
+);
 
 import verify, { verifyEndpoint } from "./verify.js";
 
