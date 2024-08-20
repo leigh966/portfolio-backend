@@ -42,7 +42,7 @@ export class DatabaseEntity {
   }
 
   async deleteById(id) {
-    const query = `DELETE FROM projects WHERE id=${id}`;
+    const query = `DELETE FROM ${this.tableName} WHERE id=${id}`;
     await this.dbClient.query(query);
   }
 
