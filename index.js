@@ -55,7 +55,7 @@ app.post("/image", upload.single("image"), (req, res) =>
 
 app.delete("/project/:id", (req, res) =>
   verifyEndpoint(req, res, () =>
-    standardDelete(req.paramInt("id"), res, getClient())
+    standardDelete(req.paramInt("id"), res, Project)
   )
 );
 

@@ -43,7 +43,7 @@ export class DatabaseEntity {
 
   async deleteById(id) {
     const query = `DELETE FROM projects WHERE id=${id}`;
-    await client.query(query);
+    await this.dbClient.query(query);
   }
 
   async updateById(id, columns, values) {

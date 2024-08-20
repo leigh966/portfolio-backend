@@ -11,7 +11,7 @@ export function standardGetAll(res, dbEntity) {
 }
 
 export function standardDelete(id, res, dbEntity) {
-  const entityObj = new dbEntity(client);
+  const entityObj = new dbEntity(getClient());
   entityObj.deleteById(id).then(() => {
     res.status(204);
     res.send("Done");
