@@ -58,6 +58,16 @@ app.delete("/project/:id", (req, res) =>
     standardDelete(req.paramInt("id"), res, Project)
   )
 );
+app.delete("/employment/:id", (req, res) =>
+  verifyEndpoint(req, res, () =>
+    standardDelete(req.paramInt("id"), res, Employment)
+  )
+);
+app.delete("/education/:id", (req, res) =>
+  verifyEndpoint(req, res, () =>
+    standardDelete(req.paramInt("id"), res, Education)
+  )
+);
 
 app.get("/education", (req, res) => standardGetAll(res, Education));
 app.get("/employment", (req, res) => standardGetAll(res, Employment));
