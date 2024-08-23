@@ -35,48 +35,14 @@ export async function image_exists(image_filename) {
 }
 import { restoreDangerousCharacters } from "./validation.js";
 export function upload_image(request, response, image_handler) {
-  // if (!verify.sessionId(request.headers.session_id)) {
-  //   response.status(401);
-  //   response.send("Authentication Failed");
-  //   return;
-  // }
+  if (!verify.sessionId(request.headers.session_id)) {
+    response.status(401);
+    response.send("Authentication Failed");
+    return;
+  }
 
   image_handler.save(request.file).then((filename) => {
     response.status(201);
     response.send(filename);
   });
-}
-
-export function get_image(req, res) {
-  const filename = req.paramString("filename");
-  let command = new GetObjectCommand({
-    Bucket: process.env.S3_BUCKET,
-    Key: filename,
-  });
-  aws_client
-    .send(command)
-    .then((awsResponse) => {
-      res.status(200);
-      const splitFn = filename.split(".");
-      res.type(splitFn[splitFn.length - 1]);
-      const options = {
-        root: path.join("temp"),
-      };
-      let filePath = "temp/" + filename;
-      function resolve() {
-        res.sendFile(filename, options);
-      }
-      let file = fs.createWriteStream(filePath);
-      // Attach a 'data' listener to add the chunks of data to our array
-      // Each chunk is a Buffer instance
-      awsResponse.Body.on("data", (chunk) => {
-        file.write(chunk);
-      });
-
-      // Once the stream has no more data, join the chunks into a string and return the string
-      awsResponse.Body.once("end", resolve);
-    })
-    .catch((err) => {
-      handleGetObjectError(err, res);
-    });
 }

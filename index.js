@@ -2,7 +2,7 @@
 import express from "express";
 const app = express();
 import { getClient } from "./postgres_client.js";
-import { upload_image, get_image } from "./images.js";
+import { upload_image } from "./images.js";
 import multer from "multer";
 import fs from "fs";
 import https from "https";
@@ -30,10 +30,7 @@ if (process.env.S3_BUCKET) {
       cb(null, "public/");
     },
     filename: (request, file, cb) => {
-      let uuid = uuidv4().toString();
-      var temp_file_arr = file.originalname.split(".");
-      var temp_file_extension = temp_file_arr[temp_file_arr.length - 1];
-      cb(null, uuid + "." + temp_file_extension);
+      cb(null, ImageHandler.generateFilename(file));
     },
   });
 }
@@ -117,8 +114,6 @@ app.post("/login", (req, res) => {
   res.status(401);
   res.send("Failed To Authenticate");
 });
-
-app.get("/image/:filename", get_image);
 app.get("/image_url/:filename", (req, res) => {
   image_handler.get_url(req.params.filename).then((url) => {
     res.send(url);
@@ -132,6 +127,8 @@ import {
   standardInsert,
   standardUpdate,
 } from "./standardised-endpoints.js";
+import { client } from "./aws-operations.js";
+import { ImageHandler } from "./ImageHandlers/ImageHandler.js";
 setup_table(getClient());
 import { Education } from "./Database/Entities/Education.js";
 import { Employment } from "./Database/Entities/Employment.js";
