@@ -1,6 +1,7 @@
 import { DatabaseEntity } from "./DatabaseEntity.js";
 import { image_exists } from "../../images.js";
 import FileNotFoundError from "../../FileNotFoundError.js";
+import { restoreDangerousCharacters } from "../../validation.js";
 
 export class Project extends DatabaseEntity {
   columns = ["name", "description", "tagline", "image_filename"];
@@ -14,7 +15,9 @@ export class Project extends DatabaseEntity {
   async confirmImageExistence(callbackTrue, callbackNull) {
     const image_filename = this.values[3];
     if (image_filename != null && image_filename != "") {
-      const exists = await image_exists(image_filename);
+      const exists = await image_exists(
+        restoreDangerousCharacters(image_filename)
+      );
       if (exists) {
         return callbackTrue();
       } else {
