@@ -50,7 +50,7 @@ app.post("/image", upload.single("image"), (req, res) =>
   upload_image(req, res, image_handler)
 );
 
-app.delete("/project/:id", (req, res) =>
+app.delete("/projects/:id", (req, res) =>
   verifyEndpoint(req, res, () =>
     standardDelete(req.paramInt("id"), res, Project)
   )
@@ -70,7 +70,7 @@ app.get("/education", (req, res) => standardGetAll(res, Education));
 app.get("/employment", (req, res) => standardGetAll(res, Employment));
 app.get("/projects", (req, res) => standardGetAll(res, Project));
 
-app.post("/project", (req, res) =>
+app.post("/projects", (req, res) =>
   verifyEndpoint(req, res, () => standardInsert(req.body, res, Project))
 );
 app.post("/employment", (req, res) =>
@@ -80,7 +80,7 @@ app.post("/education", (req, res) =>
   verifyEndpoint(req, res, () => standardInsert(req.body, res, Education))
 );
 
-app.put("/project/:id", (req, res) =>
+app.put("/projects/:id", (req, res) =>
   verifyEndpoint(req, res, () =>
     standardUpdate(req.paramInt("id"), req.body, res, Project)
   )
