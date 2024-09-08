@@ -1,4 +1,3 @@
-import { client } from "../../aws-operations.js";
 import {
   removeDangerousCharacters,
   restoreDangerousCharacters,
