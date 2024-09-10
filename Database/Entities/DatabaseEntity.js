@@ -11,6 +11,11 @@ export class DatabaseEntity {
     this.values = values.map((val) => removeDangerousCharacters(val));
     this.id = id;
   }
+
+  async cleanupClient() {
+    this.dbClient.end();
+  }
+
   async getAll() {
     let dbResponse = await this.dbClient.query(
       `SELECT * FROM ${this.tableName};`
@@ -26,12 +31,14 @@ export class DatabaseEntity {
       }
       output.push(outputRow);
     }
+    this.cleanupClient();
     return output;
   }
   async insert(columns, values) {
     const colText = columns.join(",");
     const text = `INSERT INTO ${this.tableName}(${colText}) VALUES($1, $2, $3, $4) RETURNING *`;
     const dbRes = await this.dbClient.query(text, values);
+    this.cleanupClient();
     return dbRes.rows.length > 0;
   }
 
@@ -43,6 +50,7 @@ export class DatabaseEntity {
   async deleteById(id) {
     const query = `DELETE FROM ${this.tableName} WHERE id=${id}`;
     await this.dbClient.query(query);
+    this.cleanupClient();
   }
 
   async updateById(id, columns, values) {
@@ -54,6 +62,7 @@ export class DatabaseEntity {
     query += ` WHERE id=${id} RETURNING *;`;
     console.log(query);
     const dbRes = await this.dbClient.query(query, values);
+    this.cleanupClient();
     return dbRes.rows.length > 0;
   }
 
