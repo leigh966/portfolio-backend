@@ -30,6 +30,48 @@
 
 </details>
 
+### Images
+
+<details>
+ <summary><code>POST</code> <code><b>/image</b></code></summary>
+
+##### Parameters
+
+> | Name       | Type     | Data Type                         | Description                                                                    |
+> | ---------- | -------- | --------------------------------- | ------------------------------------------------------------------------------ |
+> | session_id | required | string (Header)                   | The session id returned by the login endpoint after successful authentication. |
+> | image      | required | Image File (Multipart-Form Entry) | The image you want to upload.                                                  |
+
+##### Responses
+
+> | http code | content-type              | response                                                                                                |
+> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------- |
+> | `201`     | `text/html;charset=UTF-8` | Filename of the file on the server                                                                      |
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                |
+> | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to access an input value not provided. I plan to patch this later. |
+
+</details>
+
+<details>
+ <summary><code>GET</code> <code><b>/image_url/:filename</b></code></summary>
+
+##### Parameters
+
+> | Name       | Type     | Data Type                         | Description                                                                    |
+> | ---------- | -------- | --------------------------------- | ------------------------------------------------------------------------------ |
+> | session_id | required | string (Header)                   | The session id returned by the login endpoint after successful authentication. |
+> | filename   | required | Image File (Multipart-Form Entry) | The image you want to upload.                                                  |
+
+##### Responses
+
+> | http code | content-type              | response                                                                                                |
+> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------- |
+> | `200`     | `text/html;charset=UTF-8` | URL to access the file matching the filename given                                                      |
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                |
+> | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to access an input value not provided. I plan to patch this later. |
+
+</details>
+
 ### Projects
 
 [comment]: <> (GET)
@@ -342,7 +384,7 @@
 > | http code | content-type              | response                                                                                                                 |
 > | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 > | `201`     | `text/html;charset=UTF-8` | `Record Updated` - Should update this to 200 or 204 at some point                                                        |
-> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |     
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |
 > | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to edit a project that does not exist, will update this to catch the and return 404 |
 
 ##### Example cURL
