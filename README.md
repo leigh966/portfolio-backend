@@ -1,5 +1,48 @@
 # Portfollio Backend
 
+## Setup
+
+### Envronment Variables
+
+In order to use this application you will need the following variables either set in your environment or provided in a .env file at the root of the file structure provided by this repo.
+
+#### PORT
+
+The port that this application should be accessible on.
+
+#### PASSWORD_HASH
+
+A SHA-512 hash of the admin password.
+
+> [!NOTE]
+> For now you will need to provide this but at a later date I will look at making a setup procedure that generates PASSWORD_HASH, SALT and SECRET_KEY.
+
+#### SALT
+
+The salt used to generate the PASSWORD_HASH.
+
+> [!NOTE]
+> For now you will need to provide this but at a later date I will look at making a setup procedure that generates PASSWORD_HASH, SALT and SECRET_KEY.
+
+#### SECRET_KEY
+
+The key used to generate the rolling code. You can put this into a authenicator app to generate one-time passcodes for 2FA login.
+
+> [!NOTE]
+> For now you will need to provide this but at a later date I will look at making a setup procedure that generates PASSWORD_HASH, SALT and SECRET_KEY.
+
+#### BACKEND_URL
+
+The address that this application will be hosted from. This will be used to generate some of the URLs that will be returned so while the application will function to a degree if this is wrong it may generate some broken links.
+
+#### ENABLE_HTTPS
+
+Do you want to use HTTPS. Set as true to use it or false to just use HTTP.
+
+#### DATABASE_URL
+
+The URL of the postgres database (including credentials) to store projects, education records and employment records.
+
 ## Endpoints
 
 ### Login
