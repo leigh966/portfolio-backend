@@ -108,9 +108,9 @@
 ##### Responses
 
 > | http code | content-type              | response                                                                                                                 |
-> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --- |
+> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 > | `201`     | `text/html;charset=UTF-8` | `Record Updated` - Should update this to 200 or 204 at some point                                                        |
-> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |     |
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |
 > | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to edit a project that does not exist, will update this to catch the and return 404 |
 
 ##### Example cURL
@@ -192,9 +192,9 @@
 ##### Responses
 
 > | http code | content-type              | response                                                                                                |
-> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------- | --- |
+> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------- |
 > | `201`     | `text/html;charset=UTF-8` | `Record Added`                                                                                          |
-> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                |     |
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                |
 > | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to access an input value not provided. I plan to patch this later. |
 
 ##### Example cURL
@@ -224,9 +224,9 @@
 ##### Responses
 
 > | http code | content-type              | response                                                                                                                 |
-> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --- |
+> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 > | `201`     | `text/html;charset=UTF-8` | `Record Updated` - Should update this to 200 or 204 at some point                                                        |
-> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |     |
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |
 > | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to edit a project that does not exist, will update this to catch the and return 404 |
 
 ##### Example cURL
@@ -308,9 +308,9 @@
 ##### Responses
 
 > | http code | content-type              | response                                                                                                |
-> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------- | --- |
+> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------- |
 > | `201`     | `text/html;charset=UTF-8` | `Record Added`                                                                                          |
-> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                |     |
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                |
 > | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to access an input value not provided. I plan to patch this later. |
 
 ##### Example cURL
@@ -340,9 +340,9 @@
 ##### Responses
 
 > | http code | content-type              | response                                                                                                                 |
-> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --- |
+> | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 > | `201`     | `text/html;charset=UTF-8` | `Record Updated` - Should update this to 200 or 204 at some point                                                        |
-> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |     |
+> | `401`     | `text/html;charset=utf-8` | `Failed To Authenticate`                                                                                                 |     
 > | `500`     | `text/html;charset=utf-8` | Internal error as a result of trying to edit a project that does not exist, will update this to catch the and return 404 |
 
 ##### Example cURL
