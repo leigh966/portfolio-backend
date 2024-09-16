@@ -1,5 +1,8 @@
 # Portfollio Backend
-
+A REST API made with Node and Express to serve as the backend for a portfolio website with public endpoints for viewing projects, employment and education as well as authenticated endpoints for modifying these.
+##### Designed to be used with:
+- [Frontend](https://github.com/leigh966/portfolio-frontend) - The actual site that users will visit to view your portfolio
+- [Admin Portal](https://github.com/leigh966/PortfolioAdminPortal) - The content management system you will use to alter what the users see
 ## Setup
 ### 0. Prerequisites
 - node
