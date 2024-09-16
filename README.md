@@ -1,8 +1,29 @@
 # Portfollio Backend
 
 ## Setup
+### 0. Prerequisites
+- node
+- npm
+  
+### 1. Downloading And Installing Dependencies
 
-### Envronment Variables
+ Clone this repo:
+```
+ git clone https://github.com/leigh966/portfollio-backend
+```
+
+ Go into the repository:
+```
+ cd portfollio-backend
+```
+
+ Install dependencies:
+```
+ npm install
+```
+
+
+### 2. Envronment Variables
 
 In order to use this application you will need the following variables either set in your environment or provided in a .env file at the root of the file structure provided by this repo.
 
@@ -42,6 +63,11 @@ Do you want to use HTTPS. Set as true to use it or false to just use HTTP.
 #### DATABASE_URL
 
 The URL of the postgres database (including credentials) to store projects, education records and employment records.
+
+### 3. Start The App
+```
+node .
+```
 
 ## Endpoints
 
