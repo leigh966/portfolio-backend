@@ -73,6 +73,18 @@ node .
 ```
 
 ## Endpoints
+### Status
+<details>
+ <summary><code>GET</code> <code><b>/</b></code></summary>
+  
+Just returns a 204. Use this in your frontend/admin portal to ensure that the backend is actually reachable.
+
+##### Example cURL
+> ```javascript
+>  curl --location 'https://localhost:3001/'
+> ```
+
+</details>
 
 ### Login
 
