@@ -1,4 +1,3 @@
-// Importing express module
 import express from "express";
 const app = express();
 import { getClient } from "./postgres_client.js";
@@ -18,6 +17,7 @@ import { v4 as uuidv4 } from "uuid";
 import { AwsImageHandler } from "./ImageHandlers/AwsImageHandler.js";
 import { FsImageHandler } from "./ImageHandlers/FsImageHandler.js";
 
+// IMAGE_HANDLING
 var storage;
 var image_handler;
 if (process.env.S3_BUCKET) {
@@ -34,9 +34,11 @@ if (process.env.S3_BUCKET) {
     },
   });
 }
-var upload = multer({ storage: storage });
 
+var upload = multer({ storage: storage });
 app.use(sanitizer.middleware);
+
+// Cross origin
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -46,10 +48,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.post("/image", upload.single("image"), (req, res) =>
-  upload_image(req, res, image_handler)
-);
-
+// DELETE
 app.delete("/projects/:id", (req, res) =>
   verifyEndpoint(req, res, () =>
     standardDelete(req.paramInt("id"), res, Project)
@@ -66,10 +65,18 @@ app.delete("/education/:id", (req, res) =>
   )
 );
 
+// GET
 app.get("/education", (req, res) => standardGetAll(res, Education));
 app.get("/employment", (req, res) => standardGetAll(res, Employment));
 app.get("/projects", (req, res) => standardGetAll(res, Project));
+app.get("/image_url/:filename", (req, res) => {
+  image_handler.get_url(req.params.filename).then((url) => {
+    res.send(url);
+    res.status(200);
+  });
+});
 
+// POST
 app.post("/projects", (req, res) =>
   verifyEndpoint(req, res, () => standardInsert(req.body, res, Project))
 );
@@ -79,12 +86,17 @@ app.post("/employment", (req, res) =>
 app.post("/education", (req, res) =>
   verifyEndpoint(req, res, () => standardInsert(req.body, res, Education))
 );
+app.post("/image", upload.single("image"), (req, res) =>
+  upload_image(req, res, image_handler)
+);
 
+// PUT
 app.put("/projects/:id", (req, res) =>
   verifyEndpoint(req, res, () =>
     standardUpdate(req.paramInt("id"), req.body, res, Project)
   )
 );
+0;
 app.put("/employment/:id", (req, res) =>
   verifyEndpoint(req, res, () =>
     standardUpdate(req.paramInt("id"), req.body, res, Employment)
@@ -96,8 +108,8 @@ app.put("/education/:id", (req, res) =>
   )
 );
 
+// LOGIN
 import verify, { verifyEndpoint } from "./verify.js";
-
 app.post("/login", (req, res) => {
   const json = req.body;
   const passwordCorrect = verify.password(
@@ -114,12 +126,8 @@ app.post("/login", (req, res) => {
   res.status(401);
   res.send("Failed To Authenticate");
 });
-app.get("/image_url/:filename", (req, res) => {
-  image_handler.get_url(req.params.filename).then((url) => {
-    res.send(url);
-    res.status(200);
-  });
-});
+
+// Server setup
 import setup_table from "./setup_table.js";
 import {
   standardDelete,
@@ -132,8 +140,6 @@ import { ImageHandler } from "./ImageHandlers/ImageHandler.js";
 setup_table(getClient());
 import { Education } from "./Database/Entities/Education.js";
 import { Employment } from "./Database/Entities/Employment.js";
-
-// Server setup
 if (process.env.ENABLE_HTTPS == "true") {
   var privateKey = fs.readFileSync(process.env.HTTPS_KEY, "utf8");
   var certificate = fs.readFileSync(process.env.HTTPS_CERT, "utf8");
