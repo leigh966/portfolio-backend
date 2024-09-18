@@ -12,8 +12,6 @@ import { Project } from "./Database/Entities/Project.js";
 import { config } from "dotenv";
 config();
 import sanitizer from "sanitize";
-import { v4 as uuidv4 } from "uuid";
-
 import { AwsImageHandler } from "./ImageHandlers/AwsImageHandler.js";
 import { FsImageHandler } from "./ImageHandlers/FsImageHandler.js";
 
@@ -66,6 +64,10 @@ app.delete("/education/:id", (req, res) =>
 );
 
 // GET
+app.get("/", (req, res) => {
+  res.status(204);
+  res.send();
+});
 app.get("/education", (req, res) => standardGetAll(res, Education));
 app.get("/employment", (req, res) => standardGetAll(res, Employment));
 app.get("/projects", (req, res) => standardGetAll(res, Project));
